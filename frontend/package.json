@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "main": "index.js",
-  "homepage": "https://identityvalley.github.io/IDVxDRI",
+  "homepage": "https://identityvalley.github.io/IDV-DRI",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
