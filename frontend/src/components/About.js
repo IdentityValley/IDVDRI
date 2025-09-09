@@ -16,7 +16,7 @@ function About() {
         <p>
           The Digital Responsibility Index (DRI) is a comprehensive evaluation framework designed to assess 
           and rank organizations based on their digital responsibility practices. It measures how well 
-          organizations implement responsible digital practices across seven key Digital Responsibility Groups (DRGs).
+          organizations implement responsible digital practices across seven key Digital Responsibility Goals (DRGs).
         </p>
         <p>
           In an increasingly digital world, organizations have a responsibility to use technology ethically, 
