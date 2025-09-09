@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BadgeGenerator from './BadgeGenerator';
-import { apiUrl } from '../api';
 import { INDICATORS_FALLBACK } from '../indicators';
+import { getCompany, deleteCompany } from '../storage';
 
 function CompanyProfile() {
   const { companyId } = useParams();
@@ -50,29 +50,29 @@ function CompanyProfile() {
   };
 
   const refresh = () => {
-    fetch(apiUrl(`/api/companies/${companyId}`))
-      .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); })
-      .then(data => setCompany(data))
-      .catch(error => console.error(`Error fetching company ${companyId}:`, error));
+    const companyData = getCompany(parseInt(companyId));
+    if (companyData) {
+      setCompany(companyData);
+    } else {
+      console.error(`Company ${companyId} not found`);
+      navigate('/');
+    }
   };
 
   useEffect(() => {
     refresh();
-    fetch(apiUrl('/api/indicators'))
-      .then(response => response.json())
-      .then(data => setIndicators(data))
-      .catch(error => {
-        console.error('Error fetching indicators, using fallback:', error);
-        setIndicators(INDICATORS_FALLBACK);
-      });
+    setIndicators(INDICATORS_FALLBACK);
   }, [companyId]);
 
   const ensureExplanation = (criterion_name) => {
     if (explanation[criterion_name]) return Promise.resolve();
-    return fetch(apiUrl('/api/llm-explain'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ criterion_name }) })
-      .then(response => response.json())
-      .then(data => setExplanation(prev => ({ ...prev, [criterion_name]: data.explanation })))
-      .catch(error => console.error('Error fetching explanation:', error));
+    // Generate explanation locally from indicator data
+    const indicator = indicators.find(ind => ind['Criterion/Metric Name'] === criterion_name);
+    if (indicator) {
+      const explanation_text = `${criterion_name}: This criterion evaluates an organisation's practice in this area. Why it matters: ${indicator.Rationale} How it's scored: ${indicator['Scoring Logic']}`;
+      setExplanation(prev => ({ ...prev, [criterion_name]: explanation_text }));
+    }
+    return Promise.resolve();
   };
 
   const toggleExplain = (criterion_name) => {
@@ -86,9 +86,8 @@ function CompanyProfile() {
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete "${company.name}"? This action cannot be undone.`)) {
-      fetch(apiUrl(`/api/companies/${company.id}`), { method: 'DELETE' })
-        .then(() => navigate('/'))
-        .catch(err => console.error('Delete failed', err));
+      deleteCompany(company.id);
+      navigate('/');
     }
   };
 
