@@ -102,3 +102,63 @@ export async function testInsertSimpleRecord() {
     return { success: false, error: err };
   }
 }
+
+// Function to check what columns actually exist in the table
+export async function checkTableColumns() {
+  try {
+    console.log('Checking table columns...');
+    
+    // Try a simple select to see what columns exist
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .limit(1);
+    
+    console.log('Column check result:', { data, error });
+    
+    if (error) {
+      console.error('Column check failed:', error);
+      return { success: false, error };
+    }
+    
+    if (data && data.length > 0) {
+      console.log('Available columns:', Object.keys(data[0]));
+    } else {
+      console.log('Table is empty, trying to insert test record...');
+      
+      // Try to insert a test record to see what columns are expected
+      const testRecord = {
+        id: 999998,
+        name: 'Schema Test',
+        scores: {},
+        perdrg: {},
+        overallscore: 1.0
+      };
+      
+      const { data: insertData, error: insertError } = await supabase
+        .from('companies')
+        .insert(testRecord)
+        .select();
+      
+      console.log('Test insert result:', { insertData, insertError });
+      
+      if (insertError) {
+        console.error('Test insert failed:', insertError);
+        return { success: false, error: insertError };
+      }
+      
+      console.log('Test insert successful, columns:', Object.keys(insertData[0]));
+      
+      // Clean up
+      await supabase
+        .from('companies')
+        .delete()
+        .eq('id', 999998);
+    }
+    
+    return { success: true, data };
+  } catch (err) {
+    console.error('Column check error:', err);
+    return { success: false, error: err };
+  }
+}
