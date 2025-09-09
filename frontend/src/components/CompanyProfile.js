@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BadgeGenerator from './BadgeGenerator';
 import { INDICATORS_FALLBACK } from '../indicators';
-import { getCompany, deleteCompany } from '../storage';
+import { apiUrl } from '../api';
 
 function CompanyProfile() {
   const { companyId } = useParams();
@@ -51,13 +51,16 @@ function CompanyProfile() {
   };
 
   const refresh = () => {
-    const companyData = getCompany(parseInt(companyId));
-    if (companyData) {
-      setCompany(companyData);
-    } else {
-      console.error(`Company ${companyId} not found`);
-      navigate('/');
-    }
+    fetch(apiUrl(`/api/companies/${companyId}`))
+      .then(response => { 
+        if (!response.ok) throw new Error(`HTTP ${response.status}`); 
+        return response.json(); 
+      })
+      .then(data => setCompany(data))
+      .catch(error => {
+        console.error(`Error fetching company ${companyId}:`, error);
+        navigate('/');
+      });
   };
 
   useEffect(() => {
@@ -87,8 +90,9 @@ function CompanyProfile() {
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete "${company.name}"? This action cannot be undone.`)) {
-      deleteCompany(company.id);
-      navigate('/');
+      fetch(apiUrl(`/api/companies/${company.id}`), { method: 'DELETE' })
+        .then(() => navigate('/'))
+        .catch(err => console.error('Delete failed', err));
     }
   };
 
