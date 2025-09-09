@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BadgeGenerator from './BadgeGenerator';
 import { apiUrl } from '../api';
+import { INDICATORS_FALLBACK } from '../indicators';
 
 function CompanyProfile() {
   const { companyId } = useParams();
@@ -60,7 +61,10 @@ function CompanyProfile() {
     fetch(apiUrl('/api/indicators'))
       .then(response => response.json())
       .then(data => setIndicators(data))
-      .catch(error => console.error('Error fetching indicators:', error));
+      .catch(error => {
+        console.error('Error fetching indicators, using fallback:', error);
+        setIndicators(INDICATORS_FALLBACK);
+      });
   }, [companyId]);
 
   const ensureExplanation = (criterion_name) => {

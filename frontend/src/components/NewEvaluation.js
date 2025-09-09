@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiUrl } from '../api';
+import { INDICATORS_FALLBACK } from '../indicators';
 
 function parseScoring(scoringLogic) {
   if (!scoringLogic) return [];
@@ -55,7 +56,10 @@ function NewEvaluation() {
     fetch(apiUrl('/api/indicators'))
       .then(response => response.json())
       .then(data => setIndicators(data))
-      .catch(error => console.error('Error fetching indicators:', error));
+      .catch(error => {
+        console.error('Error fetching indicators, using fallback:', error);
+        setIndicators(INDICATORS_FALLBACK);
+      });
   }, []);
 
   const optionsByIndicator = useMemo(() => {
