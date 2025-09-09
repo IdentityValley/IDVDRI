@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { loadCompanies, deleteCompany } from '../storage';
-import { testSupabaseConnection, inspectTableSchema } from '../supabase';
+import { testSupabaseConnection, inspectTableSchema, checkTableColumns } from '../supabase';
 
 function Leaderboard() {
   const [companies, setCompanies] = useState([]);
@@ -23,9 +23,9 @@ function Leaderboard() {
     testSupabaseConnection().then(result => {
       console.log('Connection test result:', result);
       if (result.success) {
-        // Inspect table schema
-        inspectTableSchema().then(schemaResult => {
-          console.log('Schema inspection result:', schemaResult);
+        // Check table columns
+        checkTableColumns().then(columnResult => {
+          console.log('Column check result:', columnResult);
           refresh();
         });
       } else {
@@ -49,6 +49,9 @@ function Leaderboard() {
   return (
     <div className="leaderboard">
       <h2>Organisation Leaderboard</h2>
+      <p style={{ fontSize: '12px', color: '#666', marginBottom: '16px' }}>
+        Debug: Checking Supabase table schema...
+      </p>
       <div className="vertical-leaderboard">
         {companies.map((company, index) => {
           const getRankDisplay = (rank) => `#${rank}`;
