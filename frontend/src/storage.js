@@ -5,50 +5,25 @@ import { supabase } from './supabase';
 
 export async function loadCompanies() {
   try {
+    console.log('Connecting to Supabase...');
     const { data, error } = await supabase
       .from('companies')
       .select('*')
       .order('overallScore', { ascending: false });
     
-    if (error) throw error;
+    console.log('Supabase response:', { data, error });
     
-    // If Supabase is empty but localStorage has data, migrate it
-    if ((!data || data.length === 0)) {
-      const stored = localStorage.getItem('dri_companies');
-      if (stored) {
-        console.log('Supabase is empty, migrating from localStorage...');
-        const localCompanies = JSON.parse(stored);
-        if (localCompanies.length > 0) {
-          // Migrate to Supabase
-          const { error: insertError } = await supabase
-            .from('companies')
-            .insert(localCompanies);
-          
-          if (!insertError) {
-            console.log('Successfully migrated data to Supabase');
-            // Clear localStorage after successful migration
-            localStorage.removeItem('dri_companies');
-            return localCompanies.map(company => computeScores(company, INDICATORS_FALLBACK));
-          }
-        }
-      }
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
     }
     
+    console.log('Successfully loaded companies from Supabase:', data);
     // Recompute scores for all companies
     return (data || []).map(company => computeScores(company, INDICATORS_FALLBACK));
   } catch (error) {
     console.error('Error loading companies from Supabase:', error);
-    console.log('Falling back to localStorage...');
-    
-    // Fallback to localStorage
-    try {
-      const stored = localStorage.getItem('dri_companies');
-      const companies = stored ? JSON.parse(stored) : [];
-      return companies.map(company => computeScores(company, INDICATORS_FALLBACK));
-    } catch (localError) {
-      console.error('Error loading from localStorage:', localError);
-      return [];
-    }
+    throw error;
   }
 }
 
@@ -69,110 +44,70 @@ export async function addCompany(company) {
   try {
     const computedCompany = computeScores(company, INDICATORS_FALLBACK);
     
-    const { error } = await supabase
+    console.log('Adding company to Supabase:', computedCompany);
+    const { data, error } = await supabase
       .from('companies')
-      .insert(computedCompany);
+      .insert(computedCompany)
+      .select();
     
-    if (error) throw error;
+    console.log('Supabase insert response:', { data, error });
     
+    if (error) {
+      console.error('Supabase insert error:', error);
+      throw error;
+    }
+    
+    console.log('Successfully added company to Supabase');
     return computedCompany;
   } catch (error) {
     console.error('Error adding company to Supabase:', error);
-    console.log('Falling back to localStorage...');
-    
-    // Fallback to localStorage
-    try {
-      const companies = JSON.parse(localStorage.getItem('dri_companies') || '[]');
-      companies.push(computedCompany);
-      localStorage.setItem('dri_companies', JSON.stringify(companies));
-      return computedCompany;
-    } catch (localError) {
-      console.error('Error saving to localStorage:', localError);
-      throw localError;
-    }
+    throw error;
   }
 }
 
 export async function deleteCompany(companyId) {
   try {
+    console.log('Deleting company from Supabase:', companyId);
     const { error } = await supabase
       .from('companies')
       .delete()
       .eq('id', companyId);
     
-    if (error) throw error;
+    console.log('Supabase delete response:', { error });
+    
+    if (error) {
+      console.error('Supabase delete error:', error);
+      throw error;
+    }
+    
+    console.log('Successfully deleted company from Supabase');
   } catch (error) {
     console.error('Error deleting company from Supabase:', error);
-    console.log('Falling back to localStorage...');
-    
-    // Fallback to localStorage
-    try {
-      const companies = JSON.parse(localStorage.getItem('dri_companies') || '[]');
-      const filtered = companies.filter(c => c.id !== companyId);
-      localStorage.setItem('dri_companies', JSON.stringify(filtered));
-    } catch (localError) {
-      console.error('Error deleting from localStorage:', localError);
-      throw localError;
-    }
+    throw error;
   }
 }
 
 export async function getCompany(companyId) {
   try {
+    console.log('Fetching company from Supabase:', companyId);
     const { data, error } = await supabase
       .from('companies')
       .select('*')
       .eq('id', companyId)
       .single();
     
-    if (error) throw error;
+    console.log('Supabase get company response:', { data, error });
     
+    if (error) {
+      console.error('Supabase get company error:', error);
+      throw error;
+    }
+    
+    console.log('Successfully fetched company from Supabase');
     return computeScores(data, INDICATORS_FALLBACK);
   } catch (error) {
     console.error('Error fetching company from Supabase:', error);
-    console.log('Falling back to localStorage...');
-    
-    // Fallback to localStorage
-    try {
-      const companies = JSON.parse(localStorage.getItem('dri_companies') || '[]');
-      const company = companies.find(c => c.id === companyId);
-      return company ? computeScores(company, INDICATORS_FALLBACK) : null;
-    } catch (localError) {
-      console.error('Error loading from localStorage:', localError);
-      return null;
-    }
+    throw error;
   }
 }
 
-// Manual migration function - call this to force migrate localStorage to Supabase
-export async function migrateToSupabase() {
-  try {
-    const stored = localStorage.getItem('dri_companies');
-    if (!stored) {
-      console.log('No data in localStorage to migrate');
-      return { success: false, message: 'No data in localStorage' };
-    }
-    
-    const localCompanies = JSON.parse(stored);
-    if (localCompanies.length === 0) {
-      console.log('No companies in localStorage to migrate');
-      return { success: false, message: 'No companies in localStorage' };
-    }
-    
-    console.log(`Migrating ${localCompanies.length} companies to Supabase...`);
-    
-    const { error } = await supabase
-      .from('companies')
-      .insert(localCompanies);
-    
-    if (error) throw error;
-    
-    console.log('Successfully migrated data to Supabase');
-    localStorage.removeItem('dri_companies');
-    
-    return { success: true, message: `Migrated ${localCompanies.length} companies` };
-  } catch (error) {
-    console.error('Error migrating to Supabase:', error);
-    return { success: false, message: error.message };
-  }
-}

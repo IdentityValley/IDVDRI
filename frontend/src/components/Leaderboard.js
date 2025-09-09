@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { loadCompanies, deleteCompany, migrateToSupabase } from '../storage';
+import { loadCompanies, deleteCompany } from '../storage';
+import { testSupabaseConnection } from '../supabase';
 
 function Leaderboard() {
   const [companies, setCompanies] = useState([]);
-  const [migrationStatus, setMigrationStatus] = useState('');
 
   const refresh = async () => {
     try {
@@ -18,7 +18,17 @@ function Leaderboard() {
     }
   };
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => { 
+    // Test connection first
+    testSupabaseConnection().then(result => {
+      console.log('Connection test result:', result);
+      if (result.success) {
+        refresh();
+      } else {
+        console.error('Supabase connection failed, cannot load companies');
+      }
+    });
+  }, []);
 
   const handleDelete = async (id, companyName) => {
     if (window.confirm(`Are you sure you want to delete "${companyName}"? This action cannot be undone.`)) {
@@ -31,31 +41,10 @@ function Leaderboard() {
     }
   };
 
-  const handleMigration = async () => {
-    setMigrationStatus('Migrating...');
-    try {
-      const result = await migrateToSupabase();
-      setMigrationStatus(result.message);
-      if (result.success) {
-        await refresh();
-      }
-    } catch (error) {
-      setMigrationStatus('Migration failed: ' + error.message);
-    }
-  };
 
   return (
     <div className="leaderboard">
       <h2>Organisation Leaderboard</h2>
-      
-      {/* Migration button and status */}
-      <div style={{ marginBottom: '16px', padding: '8px', background: '#f0f0f0', border: '1px solid #ccc' }}>
-        <button onClick={handleMigration} style={{ marginRight: '8px' }}>
-          Migrate to Supabase
-        </button>
-        {migrationStatus && <span style={{ color: migrationStatus.includes('Successfully') ? 'green' : 'red' }}>{migrationStatus}</span>}
-      </div>
-      
       <div className="vertical-leaderboard">
         {companies.map((company, index) => {
           const getRankDisplay = (rank) => `#${rank}`;
