@@ -12,6 +12,28 @@ export async function loadCompanies() {
     
     if (error) throw error;
     
+    // If Supabase is empty but localStorage has data, migrate it
+    if ((!data || data.length === 0)) {
+      const stored = localStorage.getItem('dri_companies');
+      if (stored) {
+        console.log('Supabase is empty, migrating from localStorage...');
+        const localCompanies = JSON.parse(stored);
+        if (localCompanies.length > 0) {
+          // Migrate to Supabase
+          const { error: insertError } = await supabase
+            .from('companies')
+            .insert(localCompanies);
+          
+          if (!insertError) {
+            console.log('Successfully migrated data to Supabase');
+            // Clear localStorage after successful migration
+            localStorage.removeItem('dri_companies');
+            return localCompanies.map(company => computeScores(company, INDICATORS_FALLBACK));
+          }
+        }
+      }
+    }
+    
     // Recompute scores for all companies
     return (data || []).map(company => computeScores(company, INDICATORS_FALLBACK));
   } catch (error) {
@@ -119,5 +141,38 @@ export async function getCompany(companyId) {
       console.error('Error loading from localStorage:', localError);
       return null;
     }
+  }
+}
+
+// Manual migration function - call this to force migrate localStorage to Supabase
+export async function migrateToSupabase() {
+  try {
+    const stored = localStorage.getItem('dri_companies');
+    if (!stored) {
+      console.log('No data in localStorage to migrate');
+      return { success: false, message: 'No data in localStorage' };
+    }
+    
+    const localCompanies = JSON.parse(stored);
+    if (localCompanies.length === 0) {
+      console.log('No companies in localStorage to migrate');
+      return { success: false, message: 'No companies in localStorage' };
+    }
+    
+    console.log(`Migrating ${localCompanies.length} companies to Supabase...`);
+    
+    const { error } = await supabase
+      .from('companies')
+      .insert(localCompanies);
+    
+    if (error) throw error;
+    
+    console.log('Successfully migrated data to Supabase');
+    localStorage.removeItem('dri_companies');
+    
+    return { success: true, message: `Migrated ${localCompanies.length} companies` };
+  } catch (error) {
+    console.error('Error migrating to Supabase:', error);
+    return { success: false, message: error.message };
   }
 }
