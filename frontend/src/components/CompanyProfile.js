@@ -102,18 +102,17 @@ function CompanyProfile() {
   };
 
   return (
-    <div className="company-profile" style={{ position: 'relative' }}>
-      <div className="controls" style={{ marginBottom: 16 }}>
+    <div className="company-profile">
+      <div className="controls" style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <button onClick={() => navigate('/')}>← Back</button>
+        <button 
+          className="delete-btn" 
+          onClick={handleDelete}
+          title="Delete Organisation"
+        >
+          Delete
+        </button>
       </div>
-      
-      <button 
-        className="delete-btn" 
-        onClick={handleDelete}
-        title="Delete Organisation"
-      >
-        Delete
-      </button>
       
       <div className="company-header">
         <h2 style={{ margin: 0 }}>{company.name}</h2>
@@ -195,9 +194,9 @@ function CompanyProfile() {
                         const safeMax = maxScore && maxScore > 0 ? maxScore : 5;
                         return (
                           <div>
-                            <div style={{ fontWeight: 700, marginBottom: 6 }}>Score: {value} / {safeMax}</div>
+                            <div style={{ fontWeight: 700, marginBottom: 6, color: '#000' }}>Score: {value} / {safeMax}</div>
                             {indicator['Rationale'] && (
-                              <div style={{ marginBottom: 8 }}><strong>Why are we asking this?</strong> {indicator['Rationale']}</div>
+                              <div style={{ marginBottom: 8, color: '#000' }}><strong>Why are we asking this?</strong> {indicator['Rationale']}</div>
                             )}
                             {indicator['Legend'] && (
                               <div>
