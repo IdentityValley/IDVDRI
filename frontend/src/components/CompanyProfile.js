@@ -108,7 +108,7 @@ function CompanyProfile() {
             <li className="list-item" key={drg}>
               <div style={{ display: 'flex', alignItems: 'center', width: 140, fontWeight: 600 }}>
                 <img 
-                  src={`/DRG${drg}.png`} 
+                  src={`${process.env.PUBLIC_URL}/DRG${drg}.png`} 
                   alt={`DRG ${drg}`}
                   style={{ width: 24, height: 24, marginRight: 8 }}
                 />
