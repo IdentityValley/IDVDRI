@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { listCompanies } from '../services/firebaseClient';
+import { apiUrl } from '../api';
 
 function Leaderboard() {
   const [companies, setCompanies] = useState([]);
 
   const refresh = () => {
-    listCompanies()
-      .then(data => setCompanies(data))
+    fetch(apiUrl('/api/companies'))
+      .then(response => response.json())
+      .then(data => {
+        const sorted = [...data].sort((a, b) => (b.overallScore || 0) - (a.overallScore || 0));
+        setCompanies(sorted);
+      })
       .catch(error => console.error('Error fetching companies:', error));
   };
 
@@ -15,7 +19,7 @@ function Leaderboard() {
 
   const handleDelete = (id, companyName) => {
     if (window.confirm(`Are you sure you want to delete "${companyName}"? This action cannot be undone.`)) {
-      fetch(`/api/companies/${id}`, { method: 'DELETE' })
+      fetch(apiUrl(`/api/companies/${id}`), { method: 'DELETE' })
         .then(() => refresh())
         .catch(err => console.error('Delete failed', err));
     }
@@ -24,9 +28,6 @@ function Leaderboard() {
   return (
     <div className="leaderboard">
       <h2>Organisation Leaderboard</h2>
-      <div className="helper" style={{ margin: '8px 0 16px' }}>
-        Want to add an organisation? Use the submission form below. Entries update the shared leaderboard automatically.
-      </div>
       <div className="vertical-leaderboard">
         {companies.map((company, index) => {
           const getRankDisplay = (rank) => `#${rank}`;
@@ -47,7 +48,9 @@ function Leaderboard() {
                 <div className="progress" style={{ width: `${Math.min(100, (company.overallScore || 0) * 10)}%` }} />
               </div>
             </div>
-            {/* Controls removed for public static hosting */}
+            <div className="controls">
+              <button onClick={() => handleDelete(company.id, company.name)}>Delete</button>
+            </div>
           </div>
           );
         })}

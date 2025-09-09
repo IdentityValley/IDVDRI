@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BadgeGenerator from './BadgeGenerator';
-import { getCompanyById } from '../services/firebaseClient';
+import { apiUrl } from '../api';
 
 function CompanyProfile() {
   const { companyId } = useParams();
@@ -49,27 +49,23 @@ function CompanyProfile() {
   };
 
   const refresh = () => {
-    getCompanyById(companyId)
-      .then(data => { if (data) setCompany(prev => ({ ...prev, ...data })); })
+    fetch(apiUrl(`/api/companies/${companyId}`))
+      .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); })
+      .then(data => setCompany(data))
       .catch(error => console.error(`Error fetching company ${companyId}:`, error));
   };
 
   useEffect(() => {
     refresh();
-    fetch('/api/indicators')
+    fetch(apiUrl('/api/indicators'))
       .then(response => response.json())
       .then(data => setIndicators(data))
-      .catch(() => {
-        fetch(process.env.PUBLIC_URL + '/indicators.json')
-          .then(res => res.ok ? res.json() : [])
-          .then(data => setIndicators(Array.isArray(data) ? data : []))
-          .catch(err => console.error('Error fetching indicators fallback:', err));
-      });
+      .catch(error => console.error('Error fetching indicators:', error));
   }, [companyId]);
 
   const ensureExplanation = (criterion_name) => {
     if (explanation[criterion_name]) return Promise.resolve();
-    return fetch('/api/llm-explain', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ criterion_name }) })
+    return fetch(apiUrl('/api/llm-explain'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ criterion_name }) })
       .then(response => response.json())
       .then(data => setExplanation(prev => ({ ...prev, [criterion_name]: data.explanation })))
       .catch(error => console.error('Error fetching explanation:', error));
@@ -84,7 +80,13 @@ function CompanyProfile() {
     }
   };
 
-  const handleDelete = () => navigate('/');
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete "${company.name}"? This action cannot be undone.`)) {
+      fetch(apiUrl(`/api/companies/${company.id}`), { method: 'DELETE' })
+        .then(() => navigate('/'))
+        .catch(err => console.error('Delete failed', err));
+    }
+  };
 
   return (
     <div className="company-profile">
@@ -184,7 +186,7 @@ function CompanyProfile() {
       </div>
 
       <div className="controls" style={{ marginTop: 24, textAlign: 'center' }}>
-        <button onClick={handleDelete}>Back to Leaderboard</button>
+        <button onClick={handleDelete}>Delete Organisation</button>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { addCompany } from '../services/firebaseClient';
+import { apiUrl } from '../api';
 
 function parseScoring(scoringLogic) {
   if (!scoringLogic) return [];
@@ -52,16 +52,10 @@ function NewEvaluation() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const indicatorsUrl = '/api/indicators';
-    fetch(indicatorsUrl)
+    fetch(apiUrl('/api/indicators'))
       .then(response => response.json())
       .then(data => setIndicators(data))
-      .catch(() => {
-        fetch(process.env.PUBLIC_URL + '/indicators.json')
-          .then(res => res.ok ? res.json() : [])
-          .then(data => setIndicators(Array.isArray(data) ? data : []))
-          .catch(err => console.error('Error fetching indicators fallback:', err));
-      });
+      .catch(error => console.error('Error fetching indicators:', error));
   }, []);
 
   const optionsByIndicator = useMemo(() => {
@@ -112,11 +106,17 @@ function NewEvaluation() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const newCompany = {
+      id: Date.now(),
       name: companyName,
       scores: scores,
       overallScore: calculateOverallScore(),
     };
-    addCompany(newCompany)
+    fetch(apiUrl('/api/companies'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newCompany),
+    })
+      .then(response => response.json())
       .then(() => navigate('/'))
       .catch(error => console.error('Error adding company:', error));
   };

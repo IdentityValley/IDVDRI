@@ -13,6 +13,17 @@ except Exception:
 app = Flask(__name__)
 CORS(app) # Enable CORS for all routes
 
+# --- Supabase client (optional) ---
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_ANON_KEY')
+_supabase = None
+if SUPABASE_URL and SUPABASE_KEY:
+    try:
+        from supabase import create_client
+        _supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    except Exception as e:
+        _supabase = None
+
 # Define the path to the CSV file (absolute, based on this file's location)
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 CSV_FILE_PATH = os.path.join(BASE_DIR, 'Indicator_Shortlist_with_Q_Rationale.csv')
@@ -253,14 +264,28 @@ def load_indicators():
         return []
 
 def load_companies():
-    """Loads company data from companies.json."""
+    """Load companies from Supabase if configured, else from companies.json."""
+    if _supabase is not None:
+        try:
+            resp = _supabase.table('companies').select('*').execute()
+            items = resp.data or []
+            return items
+        except Exception:
+            pass
     if os.path.exists(COMPANIES_FILE):
         with open(COMPANIES_FILE, 'r') as f:
             return json.load(f)
     return []
 
 def save_companies(companies):
-    """Saves company data to companies.json."""
+    """Persist companies: Supabase if configured, else JSON file."""
+    if _supabase is not None:
+        try:
+            # Upsert all rows
+            _supabase.table('companies').upsert(companies, on_conflict='id').execute()
+            return
+        except Exception:
+            pass
     with open(COMPANIES_FILE, 'w') as f:
         json.dump(companies, f, indent=4)
 
@@ -338,6 +363,12 @@ def get_companies():
 def add_company():
     new_company = request.json
     compute_scores(new_company)
+    # Persist single row to Supabase if available
+    if _supabase is not None:
+        try:
+            _supabase.table('companies').upsert(new_company, on_conflict='id').execute()
+        except Exception:
+            pass
     companies_data.append(new_company)
     save_companies(companies_data)
     return jsonify(new_company), 201
@@ -352,6 +383,11 @@ def get_company(company_id):
 @app.route('/api/companies/<int:company_id>', methods=['DELETE'])
 def delete_company(company_id):
     global companies_data
+    if _supabase is not None:
+        try:
+            _supabase.table('companies').delete().eq('id', company_id).execute()
+        except Exception:
+            pass
     companies_data = [c for c in companies_data if c.get('id') != company_id]
     save_companies(companies_data)
     return jsonify({"deleted": company_id}), 200
@@ -417,4 +453,5 @@ def get_badge(company_id):
     return Response(svg_content, mimetype="image/svg+xml")
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
