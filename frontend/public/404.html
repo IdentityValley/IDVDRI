@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0;url=/#/" />
+    <script>
+      // Redirect 404s to index for SPA routing with hash
+      var l = window.location;
+      l.replace(l.protocol + '//' + l.host + l.pathname.replace(/^(.*)\/404\.html$/, '$1') + '/#' + l.hash);
+    </script>
+  </head>
+  <body></body>
+  </html>
+
+

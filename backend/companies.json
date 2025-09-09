@@ -1,5 +1,41 @@
 [
     {
+        "id": 1757070073497,
+        "name": "A good company",
+        "scores": {
+            "Digital Literacy Policy & Governance": 3,
+            "Capacity building": 3,
+            "Multilingual & Clear Communication": 1,
+            "Security Certification/Compliance": 2,
+            "Security Awareness Training Coverage": 2,
+            "Incident response plan": 3,
+            "Data Subject Requests (Volume & Response Time)": 3,
+            "Privacy Governance & Accountability": 4,
+            "PET adoption": 2,
+            "User Consent and Preference Management": 4,
+            "Interoperability & Portability": 3,
+            "Participation in Data Altruism": 0,
+            "Algorithmic Impact Assessments Conducted": 1,
+            "AI Ethics Board & Oversight": 3,
+            "Public Digital Ethics Principles Published": 1,
+            "Clear Privacy Policy & Data Use Disclosure": 3,
+            "Open Communication Channels": 1,
+            "Stakeholder Engagement": 2,
+            "Sustainable Development Goals": 4,
+            "Board-Level Digital-Risk Governance": 2
+        },
+        "overallScore": 5.88,
+        "perDRG": {
+            "1": 5.0,
+            "2": 5.38,
+            "3": 6.92,
+            "4": 6.36,
+            "5": 4.0,
+            "6": 6.25,
+            "7": 7.27
+        }
+    },
+    {
         "id": 1757094919145,
         "name": "Mediocre Industries",
         "scores": {
@@ -105,186 +141,6 @@
             "5": 10.0,
             "6": 10.0,
             "7": 10.0
-        }
-    },
-    {
-        "id": 1757323558005,
-        "name": "NextGen LLC",
-        "scores": {
-            "Capacity building": 3,
-            "Digital Literacy Policy & Governance": 1,
-            "Multilingual & Clear Communication": 3,
-            "Security Awareness Training Coverage": 1,
-            "Incident response plan": 0,
-            "Security Certification/Compliance": 3,
-            "Data Subject Requests (Volume & Response Time)": 3,
-            "PET adoption": 2,
-            "Privacy Governance & Accountability": 0,
-            "Interoperability & Portability": 1,
-            "Participation in Data Altruism": 0,
-            "User Consent and Preference Management": 1,
-            "AI Ethics Board & Oversight": 4,
-            "Algorithmic Impact Assessments Conducted": 3,
-            "Clear Privacy Policy & Data Use Disclosure": 1,
-            "Open Communication Channels": 2,
-            "Public Digital Ethics Principles Published": 1,
-            "Board-Level Digital-Risk Governance": 2,
-            "Stakeholder Engagement": 4,
-            "Sustainable Development Goals": 3
-        },
-        "overallScore": 4.75,
-        "perDRG": {
-            "1": 5.0,
-            "2": 3.08,
-            "3": 3.85,
-            "4": 1.82,
-            "5": 7.0,
-            "6": 5.0,
-            "7": 8.18
-        }
-    },
-    {
-        "id": 1757323630176,
-        "name": "Smart Computers",
-        "scores": {
-            "Capacity building": 1,
-            "Digital Literacy Policy & Governance": 2,
-            "Multilingual & Clear Communication": 0,
-            "Incident response plan": 0,
-            "Security Awareness Training Coverage": 2,
-            "Security Certification/Compliance": 1,
-            "Data Subject Requests (Volume & Response Time)": 3,
-            "PET adoption": 1,
-            "Privacy Governance & Accountability": 3,
-            "Interoperability & Portability": 1,
-            "Participation in Data Altruism": 3,
-            "User Consent and Preference Management": 3,
-            "AI Ethics Board & Oversight": 1,
-            "Algorithmic Impact Assessments Conducted": 0,
-            "Clear Privacy Policy & Data Use Disclosure": 0,
-            "Open Communication Channels": 0,
-            "Public Digital Ethics Principles Published": 0,
-            "Board-Level Digital-Risk Governance": 0,
-            "Stakeholder Engagement": 2,
-            "Sustainable Development Goals": 0
-        },
-        "overallScore": 2.88,
-        "perDRG": {
-            "1": 2.14,
-            "2": 2.31,
-            "3": 5.38,
-            "4": 6.36,
-            "5": 1.0,
-            "6": 0.0,
-            "7": 1.82
-        }
-    },
-    {
-        "id": 1757323735712,
-        "name": "Worst.ai",
-        "scores": {
-            "Capacity building": 0,
-            "Digital Literacy Policy & Governance": 0,
-            "Multilingual & Clear Communication": 1,
-            "Incident response plan": 0,
-            "Security Awareness Training Coverage": 0,
-            "Security Certification/Compliance": 0,
-            "Data Subject Requests (Volume & Response Time)": 0,
-            "PET adoption": 0,
-            "Privacy Governance & Accountability": 0,
-            "Interoperability & Portability": 0,
-            "Participation in Data Altruism": 0,
-            "User Consent and Preference Management": 1,
-            "AI Ethics Board & Oversight": 0,
-            "Algorithmic Impact Assessments Conducted": 0,
-            "Clear Privacy Policy & Data Use Disclosure": 0,
-            "Open Communication Channels": 0,
-            "Public Digital Ethics Principles Published": 0,
-            "Board-Level Digital-Risk Governance": 0,
-            "Stakeholder Engagement": 0,
-            "Sustainable Development Goals": 0
-        },
-        "overallScore": 0.25,
-        "perDRG": {
-            "1": 0.71,
-            "2": 0.0,
-            "3": 0.0,
-            "4": 0.91,
-            "5": 0.0,
-            "6": 0.0,
-            "7": 0.0
-        }
-    },
-    {
-        "id": 1757323853634,
-        "name": "Quantum Calculations",
-        "scores": {
-            "Capacity building": 3,
-            "Digital Literacy Policy & Governance": 1,
-            "Multilingual & Clear Communication": 3,
-            "Incident response plan": 3,
-            "Security Awareness Training Coverage": 4,
-            "Security Certification/Compliance": 3,
-            "Data Subject Requests (Volume & Response Time)": 4,
-            "PET adoption": 2,
-            "Privacy Governance & Accountability": 4,
-            "Interoperability & Portability": 3,
-            "Participation in Data Altruism": 3,
-            "User Consent and Preference Management": 3,
-            "AI Ethics Board & Oversight": 4,
-            "Algorithmic Impact Assessments Conducted": 4,
-            "Clear Privacy Policy & Data Use Disclosure": 2,
-            "Open Communication Channels": 2,
-            "Public Digital Ethics Principles Published": 0,
-            "Board-Level Digital-Risk Governance": 3,
-            "Stakeholder Engagement": 1,
-            "Sustainable Development Goals": 3
-        },
-        "overallScore": 6.88,
-        "perDRG": {
-            "1": 5.0,
-            "2": 7.69,
-            "3": 7.69,
-            "4": 8.18,
-            "5": 8.0,
-            "6": 5.0,
-            "7": 6.36
-        }
-    },
-    {
-        "id": 1757323918420,
-        "name": "Bright Minds & Co",
-        "scores": {
-            "Capacity building": 2,
-            "Digital Literacy Policy & Governance": 1,
-            "Multilingual & Clear Communication": 1,
-            "Incident response plan": 3,
-            "Security Awareness Training Coverage": 1,
-            "Security Certification/Compliance": 2,
-            "Data Subject Requests (Volume & Response Time)": 1,
-            "PET adoption": 0,
-            "Privacy Governance & Accountability": 0,
-            "Interoperability & Portability": 1,
-            "Participation in Data Altruism": 3,
-            "User Consent and Preference Management": 1,
-            "AI Ethics Board & Oversight": 1,
-            "Algorithmic Impact Assessments Conducted": 0,
-            "Clear Privacy Policy & Data Use Disclosure": 0,
-            "Open Communication Channels": 1,
-            "Public Digital Ethics Principles Published": 0,
-            "Board-Level Digital-Risk Governance": 1,
-            "Stakeholder Engagement": 1,
-            "Sustainable Development Goals": 1
-        },
-        "overallScore": 2.62,
-        "perDRG": {
-            "1": 2.86,
-            "2": 4.62,
-            "3": 0.77,
-            "4": 4.55,
-            "5": 1.0,
-            "6": 1.25,
-            "7": 2.73
         }
     }
 ]
