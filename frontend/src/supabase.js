@@ -31,3 +31,74 @@ export async function testSupabaseConnection() {
     return { success: false, error: err };
   }
 }
+
+// Function to inspect table schema
+export async function inspectTableSchema() {
+  try {
+    console.log('Inspecting companies table schema...');
+    
+    // Try to get one row to see the structure
+    const { data, error } = await supabase
+      .from('companies')
+      .select('*')
+      .limit(1);
+    
+    console.log('Table schema inspection:', { data, error });
+    
+    if (error) {
+      console.error('Schema inspection error:', error);
+      return { success: false, error };
+    }
+    
+    if (data && data.length > 0) {
+      console.log('Table columns:', Object.keys(data[0]));
+    } else {
+      console.log('Table is empty, cannot inspect schema');
+    }
+    
+    return { success: true, data };
+  } catch (err) {
+    console.error('Schema inspection error:', err);
+    return { success: false, error: err };
+  }
+}
+
+// Function to test inserting a simple record
+export async function testInsertSimpleRecord() {
+  try {
+    console.log('Testing simple record insert...');
+    
+    const testRecord = {
+      id: 999999,
+      name: 'Test Company',
+      scores: {},
+      perdrg: {},
+      overallscore: 5.0
+    };
+    
+    const { data, error } = await supabase
+      .from('companies')
+      .insert(testRecord)
+      .select();
+    
+    console.log('Simple insert test result:', { data, error });
+    
+    if (error) {
+      console.error('Simple insert failed:', error);
+      return { success: false, error };
+    }
+    
+    console.log('Simple insert successful!');
+    
+    // Clean up test record
+    await supabase
+      .from('companies')
+      .delete()
+      .eq('id', 999999);
+    
+    return { success: true, data };
+  } catch (err) {
+    console.error('Simple insert error:', err);
+    return { success: false, error: err };
+  }
+}

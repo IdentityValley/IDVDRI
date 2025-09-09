@@ -9,7 +9,7 @@ export async function loadCompanies() {
     const { data, error } = await supabase
       .from('companies')
       .select('*')
-      .order('overallScore', { ascending: false });
+      .order('overallscore', { ascending: false });
     
     console.log('Supabase response:', { data, error });
     
@@ -19,8 +19,17 @@ export async function loadCompanies() {
     }
     
     console.log('Successfully loaded companies from Supabase:', data);
-    // Recompute scores for all companies
-    return (data || []).map(company => computeScores(company, INDICATORS_FALLBACK));
+    // Convert from Supabase format to our format
+    return (data || []).map(company => {
+      const convertedCompany = {
+        id: company.id,
+        name: company.name,
+        scores: company.scores,
+        perDRG: company.perdrg,
+        overallScore: company.overallscore
+      };
+      return computeScores(convertedCompany, INDICATORS_FALLBACK);
+    });
   } catch (error) {
     console.error('Error loading companies from Supabase:', error);
     throw error;
@@ -44,10 +53,19 @@ export async function addCompany(company) {
   try {
     const computedCompany = computeScores(company, INDICATORS_FALLBACK);
     
-    console.log('Adding company to Supabase:', computedCompany);
+    // Convert to lowercase column names for Supabase
+    const supabaseCompany = {
+      id: computedCompany.id,
+      name: computedCompany.name,
+      scores: computedCompany.scores,
+      perdrg: computedCompany.perDRG,
+      overallscore: computedCompany.overallScore
+    };
+    
+    console.log('Adding company to Supabase:', supabaseCompany);
     const { data, error } = await supabase
       .from('companies')
-      .insert(computedCompany)
+      .insert(supabaseCompany)
       .select();
     
     console.log('Supabase insert response:', { data, error });
@@ -104,7 +122,15 @@ export async function getCompany(companyId) {
     }
     
     console.log('Successfully fetched company from Supabase');
-    return computeScores(data, INDICATORS_FALLBACK);
+    // Convert from Supabase format to our format
+    const convertedCompany = {
+      id: data.id,
+      name: data.name,
+      scores: data.scores,
+      perDRG: data.perdrg,
+      overallScore: data.overallscore
+    };
+    return computeScores(convertedCompany, INDICATORS_FALLBACK);
   } catch (error) {
     console.error('Error fetching company from Supabase:', error);
     throw error;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { loadCompanies, deleteCompany } from '../storage';
-import { testSupabaseConnection } from '../supabase';
+import { testSupabaseConnection, inspectTableSchema } from '../supabase';
 
 function Leaderboard() {
   const [companies, setCompanies] = useState([]);
@@ -23,7 +23,11 @@ function Leaderboard() {
     testSupabaseConnection().then(result => {
       console.log('Connection test result:', result);
       if (result.success) {
-        refresh();
+        // Inspect table schema
+        inspectTableSchema().then(schemaResult => {
+          console.log('Schema inspection result:', schemaResult);
+          refresh();
+        });
       } else {
         console.error('Supabase connection failed, cannot load companies');
       }
