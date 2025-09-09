@@ -103,15 +103,21 @@ function NewEvaluation() {
     return { filled, total, avg };
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const newCompany = {
       id: Date.now(),
       name: companyName,
       scores: scores,
     };
-    addCompany(newCompany);
-    navigate('/');
+    try {
+      await addCompany(newCompany);
+      navigate('/');
+    } catch (error) {
+      console.error('Error adding company:', error);
+      // Still navigate even if there's an error
+      navigate('/');
+    }
   };
 
   return (

@@ -5,18 +5,26 @@ import { loadCompanies, deleteCompany } from '../storage';
 function Leaderboard() {
   const [companies, setCompanies] = useState([]);
 
-  const refresh = () => {
-    const companies = loadCompanies();
-    const sorted = [...companies].sort((a, b) => (b.overallScore || 0) - (a.overallScore || 0));
-    setCompanies(sorted);
+  const refresh = async () => {
+    try {
+      const companies = await loadCompanies();
+      setCompanies(companies);
+    } catch (error) {
+      console.error('Error loading companies:', error);
+      setCompanies([]);
+    }
   };
 
   useEffect(() => { refresh(); }, []);
 
-  const handleDelete = (id, companyName) => {
+  const handleDelete = async (id, companyName) => {
     if (window.confirm(`Are you sure you want to delete "${companyName}"? This action cannot be undone.`)) {
-      deleteCompany(id);
-      refresh();
+      try {
+        await deleteCompany(id);
+        await refresh();
+      } catch (error) {
+        console.error('Error deleting company:', error);
+      }
     }
   };
 

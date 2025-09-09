@@ -50,12 +50,17 @@ function CompanyProfile() {
     });
   };
 
-  const refresh = () => {
-    const companyData = getCompany(parseInt(companyId));
-    if (companyData) {
-      setCompany(companyData);
-    } else {
-      console.error(`Company ${companyId} not found`);
+  const refresh = async () => {
+    try {
+      const companyData = await getCompany(parseInt(companyId));
+      if (companyData) {
+        setCompany(companyData);
+      } else {
+        console.error(`Company ${companyId} not found`);
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Error loading company:', error);
       navigate('/');
     }
   };
@@ -85,10 +90,14 @@ function CompanyProfile() {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete "${company.name}"? This action cannot be undone.`)) {
-      deleteCompany(company.id);
-      navigate('/');
+      try {
+        await deleteCompany(company.id);
+        navigate('/');
+      } catch (error) {
+        console.error('Error deleting company:', error);
+      }
     }
   };
 
