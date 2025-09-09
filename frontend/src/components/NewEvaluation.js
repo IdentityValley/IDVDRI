@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { INDICATORS_FALLBACK } from '../indicators';
 import { addCompany } from '../storage';
+import { computeScores } from '../scoring';
 
 function parseScoring(scoringLogic) {
   if (!scoringLogic) return [];
@@ -90,8 +91,9 @@ function NewEvaluation() {
   };
 
   const calculateOverallScore = () => {
-    const total = Object.values(scores).reduce((sum, v) => sum + (Number(v) || 0), 0);
-    return indicators.length ? Number((total / indicators.length).toFixed(2)) : 0;
+    const company = { scores: scores };
+    const computed = computeScores(company, indicators);
+    return computed.overallScore;
   };
 
   const sectionStatus = (list) => {
@@ -107,7 +109,6 @@ function NewEvaluation() {
       id: Date.now(),
       name: companyName,
       scores: scores,
-      overallScore: calculateOverallScore(),
     };
     addCompany(newCompany);
     navigate('/');
