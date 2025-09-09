@@ -56,7 +56,12 @@ function NewEvaluation() {
     fetch(indicatorsUrl)
       .then(response => response.json())
       .then(data => setIndicators(data))
-      .catch(error => console.error('Error fetching indicators:', error));
+      .catch(() => {
+        fetch(process.env.PUBLIC_URL + '/indicators.json')
+          .then(res => res.ok ? res.json() : [])
+          .then(data => setIndicators(Array.isArray(data) ? data : []))
+          .catch(err => console.error('Error fetching indicators fallback:', err));
+      });
   }, []);
 
   const optionsByIndicator = useMemo(() => {
