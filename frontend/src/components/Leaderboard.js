@@ -7,7 +7,9 @@ function Leaderboard() {
 
   const refresh = async () => {
     try {
+      console.log('Loading companies...');
       const companies = await loadCompanies();
+      console.log('Loaded companies:', companies);
       setCompanies(companies);
     } catch (error) {
       console.error('Error loading companies:', error);

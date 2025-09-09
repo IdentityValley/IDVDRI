@@ -16,7 +16,17 @@ export async function loadCompanies() {
     return (data || []).map(company => computeScores(company, INDICATORS_FALLBACK));
   } catch (error) {
     console.error('Error loading companies from Supabase:', error);
-    return [];
+    console.log('Falling back to localStorage...');
+    
+    // Fallback to localStorage
+    try {
+      const stored = localStorage.getItem('dri_companies');
+      const companies = stored ? JSON.parse(stored) : [];
+      return companies.map(company => computeScores(company, INDICATORS_FALLBACK));
+    } catch (localError) {
+      console.error('Error loading from localStorage:', localError);
+      return [];
+    }
   }
 }
 
@@ -46,7 +56,18 @@ export async function addCompany(company) {
     return computedCompany;
   } catch (error) {
     console.error('Error adding company to Supabase:', error);
-    throw error;
+    console.log('Falling back to localStorage...');
+    
+    // Fallback to localStorage
+    try {
+      const companies = JSON.parse(localStorage.getItem('dri_companies') || '[]');
+      companies.push(computedCompany);
+      localStorage.setItem('dri_companies', JSON.stringify(companies));
+      return computedCompany;
+    } catch (localError) {
+      console.error('Error saving to localStorage:', localError);
+      throw localError;
+    }
   }
 }
 
@@ -60,7 +81,17 @@ export async function deleteCompany(companyId) {
     if (error) throw error;
   } catch (error) {
     console.error('Error deleting company from Supabase:', error);
-    throw error;
+    console.log('Falling back to localStorage...');
+    
+    // Fallback to localStorage
+    try {
+      const companies = JSON.parse(localStorage.getItem('dri_companies') || '[]');
+      const filtered = companies.filter(c => c.id !== companyId);
+      localStorage.setItem('dri_companies', JSON.stringify(filtered));
+    } catch (localError) {
+      console.error('Error deleting from localStorage:', localError);
+      throw localError;
+    }
   }
 }
 
@@ -77,6 +108,16 @@ export async function getCompany(companyId) {
     return computeScores(data, INDICATORS_FALLBACK);
   } catch (error) {
     console.error('Error fetching company from Supabase:', error);
-    return null;
+    console.log('Falling back to localStorage...');
+    
+    // Fallback to localStorage
+    try {
+      const companies = JSON.parse(localStorage.getItem('dri_companies') || '[]');
+      const company = companies.find(c => c.id === companyId);
+      return company ? computeScores(company, INDICATORS_FALLBACK) : null;
+    } catch (localError) {
+      console.error('Error loading from localStorage:', localError);
+      return null;
+    }
   }
 }
