@@ -333,7 +333,7 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   
   .company-info .rank-text {
     font-weight: 700;
-    color: var(--accent);
+    color: #000;
     margin-right: 8px;
   }
   
@@ -352,6 +352,10 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   
   .controls button {
     width: 100%;
+  }
+  
+  .leaderboard .controls {
+    display: none;
   }
   
   .company-profile .controls {
@@ -459,6 +463,10 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   
   .score-value {
     font-size: 18px;
+  }
+  
+  .leaderboard .controls {
+    display: none;
   }
   
   .terminal-window {
