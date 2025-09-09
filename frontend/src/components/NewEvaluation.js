@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { INDICATORS_FALLBACK } from '../indicators';
-import { apiUrl } from '../api';
+import { addCompany } from '../storage';
 import { computeScores } from '../scoring';
 
 function parseScoring(scoringLogic) {
@@ -110,18 +110,8 @@ function NewEvaluation() {
       name: companyName,
       scores: scores,
     };
-    fetch(apiUrl('/api/companies'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newCompany),
-    })
-      .then(response => response.json())
-      .then(() => navigate('/'))
-      .catch(error => {
-        console.error('Error adding company:', error);
-        // Still navigate even if API fails
-        navigate('/');
-      });
+    addCompany(newCompany);
+    navigate('/');
   };
 
   return (
