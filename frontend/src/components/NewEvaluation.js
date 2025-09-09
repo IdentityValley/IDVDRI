@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiUrl } from '../api';
 import { INDICATORS_FALLBACK } from '../indicators';
+import { addCompany } from '../storage';
 
 function parseScoring(scoringLogic) {
   if (!scoringLogic) return [];
@@ -53,13 +53,7 @@ function NewEvaluation() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(apiUrl('/api/indicators'))
-      .then(response => response.json())
-      .then(data => setIndicators(data))
-      .catch(error => {
-        console.error('Error fetching indicators, using fallback:', error);
-        setIndicators(INDICATORS_FALLBACK);
-      });
+    setIndicators(INDICATORS_FALLBACK);
   }, []);
 
   const optionsByIndicator = useMemo(() => {
@@ -115,14 +109,8 @@ function NewEvaluation() {
       scores: scores,
       overallScore: calculateOverallScore(),
     };
-    fetch(apiUrl('/api/companies'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newCompany),
-    })
-      .then(response => response.json())
-      .then(() => navigate('/'))
-      .catch(error => console.error('Error adding company:', error));
+    addCompany(newCompany);
+    navigate('/');
   };
 
   return (
