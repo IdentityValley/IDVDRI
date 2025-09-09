@@ -282,6 +282,178 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   51%, 100% { opacity: 0; }
 }
 
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 12px;
+  }
+  
+  .navbar {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 0;
+  }
+  
+  .brand h1 {
+    font-size: 24px;
+  }
+  
+  .navbar ul {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  
+  .navbar li {
+    width: 100%;
+  }
+  
+  .navbar a {
+    display: block;
+    text-align: center;
+    padding: 12px;
+  }
+  
+  .leaderboard-item {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+  
+  .company-info {
+    text-align: center;
+  }
+  
+  .score-display {
+    justify-content: center;
+  }
+  
+  .progress-container {
+    width: 100%;
+  }
+  
+  .controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .controls button {
+    width: 100%;
+  }
+  
+  .company-profile .controls {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .company-profile .controls button {
+    width: auto;
+    flex: 1;
+  }
+  
+  .tabs {
+    flex-direction: column;
+  }
+  
+  .tab {
+    margin-right: 0;
+    margin-bottom: 4px;
+  }
+  
+  .evaluation-section {
+    margin-bottom: 20px;
+  }
+  
+  .evaluation-question {
+    font-size: 14px;
+  }
+  
+  .llm-explanation {
+    padding: 8px;
+    font-size: 12px;
+  }
+  
+  .contact-page {
+    max-width: 100%;
+    padding: 0 8px;
+  }
+  
+  .terminal-window {
+    min-height: 300px;
+  }
+  
+  .terminal-body {
+    padding: 16px;
+    min-height: 250px;
+  }
+  
+  .terminal-content {
+    font-size: 14px;
+  }
+  
+  .about-page {
+    padding: 0 8px;
+  }
+  
+  .about-page h1 {
+    font-size: 28px;
+  }
+  
+  .about-page h2 {
+    font-size: 20px;
+  }
+  
+  .about-page h3 {
+    font-size: 18px;
+  }
+  
+  .footer {
+    font-size: 12px;
+    padding: 16px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand h1 {
+    font-size: 20px;
+  }
+  
+  .navbar {
+    padding: 12px 0;
+  }
+  
+  .leaderboard-item {
+    padding: 12px;
+  }
+  
+  .rank-badge {
+    font-size: 14px;
+    width: 30px;
+    height: 30px;
+  }
+  
+  .score-value {
+    font-size: 18px;
+  }
+  
+  .terminal-window {
+    min-height: 250px;
+  }
+  
+  .terminal-body {
+    padding: 12px;
+    min-height: 200px;
+  }
+  
+  .terminal-content {
+    font-size: 12px;
+  }
+  
+  .about-page h1 {
+    font-size: 24px;
+  }
+}
+
 /* About page styles */
 .about-page { max-width: 800px; margin: 0 auto; padding: 0 16px; }
 
