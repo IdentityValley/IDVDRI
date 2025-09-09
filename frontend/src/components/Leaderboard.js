@@ -57,6 +57,7 @@ function Leaderboard() {
             <div className="rank-badge">{getRankDisplay(index + 1)}</div>
             <div className="company-info">
               <h3 style={{ margin: 0 }}>
+                <span className="rank-text">#{index + 1}</span>
                 <Link to={`/company/${company.id}`}>{company.name}</Link>
               </h3>
               <div className="score-display">
