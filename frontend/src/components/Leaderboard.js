@@ -1,31 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { apiUrl } from '../api';
+import { loadCompanies, deleteCompany } from '../storage';
 
 function Leaderboard() {
   const [companies, setCompanies] = useState([]);
 
   const refresh = () => {
-    fetch(apiUrl('/api/companies'))
-      .then(response => response.json())
-      .then(data => {
-        const sorted = [...data].sort((a, b) => (b.overallScore || 0) - (a.overallScore || 0));
-        setCompanies(sorted);
-      })
-      .catch(error => {
-        console.error('Error fetching companies:', error);
-        // Fallback to empty array if backend is down
-        setCompanies([]);
-      });
+    const companies = loadCompanies();
+    const sorted = [...companies].sort((a, b) => (b.overallScore || 0) - (a.overallScore || 0));
+    setCompanies(sorted);
   };
 
   useEffect(() => { refresh(); }, []);
 
   const handleDelete = (id, companyName) => {
     if (window.confirm(`Are you sure you want to delete "${companyName}"? This action cannot be undone.`)) {
-      fetch(apiUrl(`/api/companies/${id}`), { method: 'DELETE' })
-        .then(() => refresh())
-        .catch(err => console.error('Delete failed', err));
+      deleteCompany(id);
+      refresh();
     }
   };
 
