@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { addCompany } from '../services/firebaseClient';
 
 function parseScoring(scoringLogic) {
   if (!scoringLogic) return [];
@@ -51,7 +52,8 @@ function NewEvaluation() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/api/indicators')
+    const indicatorsUrl = '/api/indicators';
+    fetch(indicatorsUrl)
       .then(response => response.json())
       .then(data => setIndicators(data))
       .catch(error => console.error('Error fetching indicators:', error));
@@ -105,17 +107,11 @@ function NewEvaluation() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const newCompany = {
-      id: Date.now(),
       name: companyName,
       scores: scores,
       overallScore: calculateOverallScore(),
     };
-    fetch('/api/companies', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newCompany),
-    })
-      .then(response => response.json())
+    addCompany(newCompany)
       .then(() => navigate('/'))
       .catch(error => console.error('Error adding company:', error));
   };

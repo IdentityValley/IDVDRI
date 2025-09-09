@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { listCompanies } from '../services/firebaseClient';
 
 function Leaderboard() {
   const [companies, setCompanies] = useState([]);
 
   const refresh = () => {
-    fetch('/api/companies')
-      .then(response => response.json())
-      .then(data => {
-        const sorted = [...data].sort((a, b) => (b.overallScore || 0) - (a.overallScore || 0));
-        setCompanies(sorted);
-      })
+    listCompanies()
+      .then(data => setCompanies(data))
       .catch(error => console.error('Error fetching companies:', error));
   };
 
@@ -27,6 +24,9 @@ function Leaderboard() {
   return (
     <div className="leaderboard">
       <h2>Organisation Leaderboard</h2>
+      <div className="helper" style={{ margin: '8px 0 16px' }}>
+        Want to add an organisation? Use the submission form below. Entries update the shared leaderboard automatically.
+      </div>
       <div className="vertical-leaderboard">
         {companies.map((company, index) => {
           const getRankDisplay = (rank) => `#${rank}`;
@@ -47,9 +47,7 @@ function Leaderboard() {
                 <div className="progress" style={{ width: `${Math.min(100, (company.overallScore || 0) * 10)}%` }} />
               </div>
             </div>
-            <div className="controls">
-              <button onClick={() => handleDelete(company.id, company.name)}>Delete</button>
-            </div>
+            {/* Controls removed for public static hosting */}
           </div>
           );
         })}

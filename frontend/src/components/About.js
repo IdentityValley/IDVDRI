@@ -29,7 +29,7 @@ function About() {
         <h2>The Seven Digital Responsibility Goals</h2>
         <div style={{ textAlign: 'center', margin: '24px 0' }}>
           <img 
-            src={process.env.PUBLIC_URL + '/DRGall.png'} 
+            src="/DRGall.png" 
             alt="Seven Digital Responsibility Goals" 
             style={{ maxWidth: '100%', height: 'auto', border: '3px solid #000', boxShadow: '6px 6px 0 #000' }}
           />

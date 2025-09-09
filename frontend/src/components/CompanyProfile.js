@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BadgeGenerator from './BadgeGenerator';
+import { getCompanyById } from '../services/firebaseClient';
 
 function CompanyProfile() {
   const { companyId } = useParams();
@@ -48,9 +49,8 @@ function CompanyProfile() {
   };
 
   const refresh = () => {
-    fetch(`/api/companies/${companyId}`)
-      .then(response => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); })
-      .then(data => setCompany(data))
+    getCompanyById(companyId)
+      .then(data => { if (data) setCompany(prev => ({ ...prev, ...data })); })
       .catch(error => console.error(`Error fetching company ${companyId}:`, error));
   };
 
@@ -79,13 +79,7 @@ function CompanyProfile() {
     }
   };
 
-  const handleDelete = () => {
-    if (window.confirm(`Are you sure you want to delete "${company.name}"? This action cannot be undone.`)) {
-      fetch(`/api/companies/${company.id}`, { method: 'DELETE' })
-        .then(() => navigate('/'))
-        .catch(err => console.error('Delete failed', err));
-    }
-  };
+  const handleDelete = () => navigate('/');
 
   return (
     <div className="company-profile">
@@ -104,7 +98,7 @@ function CompanyProfile() {
             <li className="list-item" key={drg}>
               <div style={{ display: 'flex', alignItems: 'center', width: 140, fontWeight: 600 }}>
                 <img 
-                  src={process.env.PUBLIC_URL + `/DRG${drg}.png`} 
+                  src={`/DRG${drg}.png`} 
                   alt={`DRG ${drg}`}
                   style={{ width: 24, height: 24, marginRight: 8 }}
                 />
@@ -185,7 +179,7 @@ function CompanyProfile() {
       </div>
 
       <div className="controls" style={{ marginTop: 24, textAlign: 'center' }}>
-        <button onClick={handleDelete}>Delete Organisation</button>
+        <button onClick={handleDelete}>Back to Leaderboard</button>
       </div>
     </div>
   );
