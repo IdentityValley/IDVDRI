@@ -3,42 +3,29 @@ import React, { useState, useEffect } from 'react';
 function Contact() {
   const [displayedText, setDisplayedText] = useState('');
   const [showCursor, setShowCursor] = useState(true);
-  const [currentLine, setCurrentLine] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
 
-  const terminalContent = [
-    { command: 'contact', output: 'Contact Information:' },
-    { command: '', output: 'Email: info@identityvalley.org' },
-    { command: 'help', output: 'For inquiries about the Digital Responsibility Ranking' },
-    { command: '', output: 'system, please contact us at the email address above.' }
-  ];
+  const fullText = `C:\\> contact
+Contact Information:
+Email: info@identityvalley.org
+C:\\> help
+For inquiries about the Digital Responsibility Ranking
+system, please contact us at the email address above.`;
 
   useEffect(() => {
-    if (!isTyping) return;
+    if (!isTyping || currentIndex >= fullText.length) {
+      setIsTyping(false);
+      return;
+    }
 
-    const typeText = () => {
-      if (currentLine < terminalContent.length) {
-        const currentItem = terminalContent[currentLine];
-        const fullText = currentItem.command ? `C:\\> ${currentItem.command}` : currentItem.output;
-        
-        if (displayedText.length < fullText.length) {
-          setDisplayedText(prev => prev + fullText[displayedText.length]);
-        } else {
-          // Move to next line after a delay
-          setTimeout(() => {
-            setCurrentLine(prev => prev + 1);
-            setDisplayedText(prev => prev + '\n');
-          }, 500);
-        }
-      } else {
-        // All content typed, stop typing
-        setIsTyping(false);
-      }
-    };
+    const timer = setTimeout(() => {
+      setDisplayedText(prev => prev + fullText[currentIndex]);
+      setCurrentIndex(prev => prev + 1);
+    }, 50);
 
-    const timer = setTimeout(typeText, 50);
     return () => clearTimeout(timer);
-  }, [displayedText, currentLine, isTyping, terminalContent]);
+  }, [currentIndex, isTyping, fullText]);
 
   useEffect(() => {
     // Cursor blinking effect
