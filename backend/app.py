@@ -51,7 +51,7 @@ INDICATORS_STATIC = [
     {
         'Criterion/Metric Name': 'Multilingual & Clear Communication',
         'DRG Short Code': '1',
-        'Question': 'How broadly and reliably are key digital services and user communications offered in the main languages of your user base, with usable, quality translations?',
+        'Question': 'How broadly and reliably are key digital services and user communications offered in the main languages of your user base, with usable, good‑quality translations?',
         'Rationale': 'Multilingual services promote inclusion and equal access, reducing barriers for users who do not speak the default language.',
         'Scoring Logic': '0 = No multilingual support; 1 = Minimal coverage; 2 = Basic multilingual provision; 3 = Moderate coverage; 4 = High coverage; 5 = Best practice / fully inclusive',
         'Legend': 'Minimal – few document/services, poorly translated; Basic – key user-facing services and policies available in 1-2 additional major languages; Moderate – core services consistently available in 2+ languages covering the majority of user base; High – Broad range of services and support available in several languages, translations are professionally maintained and updated; Best-practice – Comprehensive multilingual support across all digital content and customer support channels, tailored to user demographics, regularly reviewed',
@@ -398,54 +398,20 @@ def llm_explain():
 
 @app.route('/api/badge/<int:company_id>', methods=['GET'])
 def get_badge(company_id):
-    company = next((c for c in companies_data if c.get('id') == company_id), None)
+    company = next((c for c in companies_data if c['id'] == company_id), None)
     if not company:
         return "Company not found", 404
 
-    company = compute_scores(dict(company))
-    score = company.get('overallScore', 0)
-    # Pixel-edge style to match site
-    width = 360
-    height = 120
-    padding = 18
-    content_width = width - (padding * 2)
-    bar_x = padding
-    bar_y = 64
-    bar_width = content_width
-    bar_height = 28
-    fill_width = max(0, min(bar_width, (score / 10) * bar_width))
-
-    accent = "#ffdd00"
+    score = company.overallScore
+    color = "#ffdd00"  # Yellow from the palette
 
     svg_content = f'''
-    <svg width="{width}" height="{height}" viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Digital Responsibility Score {score:.1f} out of 10">
-      <defs>
-        <!-- Diagonal stripe pattern for track -->
-        <pattern id="trackStripes" patternUnits="userSpaceOnUse" width="12" height="12" patternTransform="rotate(45)">
-          <rect width="12" height="12" fill="#f2f2f2" />
-          <rect width="12" height="6" fill="#e8e8e8" />
-        </pattern>
-        <!-- Horizontal stripe pattern for fill -->
-        <pattern id="fillStripes" patternUnits="userSpaceOnUse" width="16" height="16">
-          <rect width="16" height="16" fill="{accent}" />
-          <rect y="8" width="16" height="8" fill="#ffd200" />
-        </pattern>
-      </defs>
-
-      <!-- Shadow (blocky) -->
-      <rect x="6" y="6" width="{width-6}" height="{height-6}" fill="#000" />
-      <!-- Card -->
-      <rect x="0" y="0" width="{width-6}" height="{height-6}" fill="#ffffff" stroke="#000" stroke-width="2" />
-
-      <!-- Header -->
-      <text x="{padding}" y="{padding+6}" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#000">Digital Responsibility Score</text>
-      <text x="{width-24}" y="{padding+6}" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#000" text-anchor="end">{score:.1f}/10</text>
-
-      <!-- Progress track with pixel edge style -->
-      <rect x="{bar_x}" y="{bar_y}" width="{bar_width}" height="{bar_height}" fill="url(#trackStripes)" stroke="#000" stroke-width="2" />
-      <!-- Progress fill with stripes and inner border feel -->
-      <rect x="{bar_x}" y="{bar_y}" width="{fill_width}" height="{bar_height}" fill="url(#fillStripes)" />
-      <rect x="{bar_x}" y="{bar_y}" width="{fill_width}" height="{bar_height}" fill="none" stroke="#000" stroke-width="2" />
+    <svg width="120" height="30" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="black"/>
+      <rect x="0" y="0" width="{(score/5)*100}" height="100%" fill="{color}"/>
+      <text x="50%" y="50%" font-family="Arial" font-size="14" fill="white" text-anchor="middle" alignment-baseline="middle">
+        Score: {score:.1f}
+      </text>
     </svg>
     '''
     return Response(svg_content, mimetype="image/svg+xml")
