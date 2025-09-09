@@ -299,7 +299,8 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   }
   
   .navbar ul {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
     width: 100%;
   }
@@ -318,10 +319,19 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
     flex-direction: column;
     gap: 12px;
     padding: 16px;
+    position: relative;
+  }
+  
+  .rank-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 1;
   }
   
   .company-info {
     text-align: center;
+    margin-top: 20px;
   }
   
   .score-display {
@@ -422,6 +432,16 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
     padding: 12px 0;
   }
   
+  .navbar ul {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  
+  .navbar a {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+  
   .leaderboard-item {
     padding: 12px;
   }
@@ -430,6 +450,12 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
     font-size: 14px;
     width: 30px;
     height: 30px;
+    top: 12px;
+    left: 12px;
+  }
+  
+  .company-info {
+    margin-top: 15px;
   }
   
   .score-value {
