@@ -29,6 +29,8 @@ jobs:
 
       - name: Build
         working-directory: frontend
+        env:
+          REACT_APP_API_BASE_URL: https://idvdri.onrender.com
         run: npm run build
 
       - name: Upload artifact
