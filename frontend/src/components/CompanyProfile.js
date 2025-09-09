@@ -221,7 +221,11 @@ function CompanyProfile() {
 
       <div className={`tab-content ${activeTab === 'badge' ? 'active' : ''}`}>
         <div className="section" style={{ marginTop: 16 }}>
-          <BadgeGenerator companyId={companyId} />
+          <BadgeGenerator 
+            companyId={companyId} 
+            companyName={company.name}
+            companyScore={company.overallScore}
+          />
         </div>
       </div>
     </div>
