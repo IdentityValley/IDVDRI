@@ -11,6 +11,7 @@ function CompanyProfile() {
   const [indicators, setIndicators] = useState([]);
   const [explanation, setExplanation] = useState({});
   const [open, setOpen] = useState({});
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Parse maximum score from an indicator's "Scoring Logic" string
   const getMaxScoreFromScoringLogic = (scoringLogic) => {
@@ -92,104 +93,128 @@ function CompanyProfile() {
   };
 
   return (
-    <div className="company-profile">
+    <div className="company-profile" style={{ position: 'relative' }}>
       <div className="controls" style={{ marginBottom: 16 }}>
         <button onClick={() => navigate('/')}>← Back</button>
       </div>
+      
+      <button 
+        className="delete-btn" 
+        onClick={handleDelete}
+        title="Delete Organisation"
+      >
+        Delete
+      </button>
+      
       <div className="company-header">
         <h2 style={{ margin: 0 }}>{company.name}</h2>
         <span className="badge">Overall {company.overallScore?.toFixed ? company.overallScore.toFixed(2) : company.overallScore}/10</span>
       </div>
 
-      <div className="section" style={{ marginTop: 16 }}>
-        <h3 style={{ marginTop: 0 }}>Per-DRG Breakdown</h3>
-        <ul className="list">
-          {Object.entries(company.perDRG || {}).map(([drg, value]) => (
-            <li className="list-item" key={drg}>
-              <div style={{ display: 'flex', alignItems: 'center', width: 140, fontWeight: 600 }}>
-                <img 
-                  src={`${process.env.PUBLIC_URL}/DRG${drg}.png`} 
-                  alt={`DRG ${drg}`}
-                  style={{ width: 24, height: 24, marginRight: 8 }}
-                />
-                DRG #{drg}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div className="progress-wrap">
-                  <div className="progress" style={{ width: `${Math.min(100, (value || 0) * 10)}%` }} />
-                </div>
-              </div>
-              <span className="badge">{(value || 0).toFixed(2)}/10</span>
-            </li>
-          ))}
-        </ul>
+      <div className="tabs">
+        <div 
+          className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
+          onClick={() => setActiveTab('overview')}
+        >
+          Overview
+        </div>
+        <div 
+          className={`tab ${activeTab === 'badge' ? 'active' : ''}`}
+          onClick={() => setActiveTab('badge')}
+        >
+          Create Badge
+        </div>
       </div>
 
-      <div className="section" style={{ marginTop: 16 }}>
-        <h3 style={{ marginTop: 0 }}>Evaluation Breakdown</h3>
-        <ul className="list">
-          {indicators.map(indicator => {
-            const key = indicator['Criterion/Metric Name'];
-            const value = company.scores?.[key] || 0;
-            const isOpen = !!open[key];
-            return (
-              <li className="list-item" key={key} style={{ position: 'relative', flexDirection: 'column', alignItems: 'stretch' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between' }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 600 }}>{key}</div>
-                    <div className="helper">{indicator['Question']}</div>
+      <div className={`tab-content ${activeTab === 'overview' ? 'active' : ''}`}>
+        <div className="section" style={{ marginTop: 16 }}>
+          <h3 style={{ marginTop: 0 }}>Per-DRG Breakdown</h3>
+          <ul className="list">
+            {Object.entries(company.perDRG || {}).map(([drg, value]) => (
+              <li className="list-item" key={drg}>
+                <div style={{ display: 'flex', alignItems: 'center', width: 140, fontWeight: 600 }}>
+                  <img 
+                    src={`${process.env.PUBLIC_URL}/DRG${drg}.png`} 
+                    alt={`DRG ${drg}`}
+                    style={{ width: 24, height: 24, marginRight: 8 }}
+                  />
+                  DRG #{drg}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div className="progress-wrap">
+                    <div className="progress" style={{ width: `${Math.min(100, (value || 0) * 10)}%` }} />
                   </div>
-                  <div style={{ width: 280 }}>
-                    <div className="progress-wrap">
+                </div>
+                <span className="badge">{(value || 0).toFixed(2)}/10</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="section" style={{ marginTop: 16 }}>
+          <h3 style={{ marginTop: 0 }}>Evaluation Breakdown</h3>
+          <ul className="list">
+            {indicators.map(indicator => {
+              const key = indicator['Criterion/Metric Name'];
+              const value = company.scores?.[key] || 0;
+              const isOpen = !!open[key];
+              return (
+                <li className="list-item" key={key} style={{ position: 'relative', flexDirection: 'column', alignItems: 'stretch' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600 }}>{key}</div>
+                      <div className="helper">{indicator['Question']}</div>
+                    </div>
+                    <div style={{ width: 280 }}>
+                      <div className="progress-wrap">
+                        {(() => {
+                          const maxScore = getMaxScoreFromScoringLogic(indicator['Scoring Logic']);
+                          const safeMax = maxScore && maxScore > 0 ? maxScore : 5;
+                          const percent = Math.max(0, Math.min(100, (value / safeMax) * 100));
+                          return <div className="progress" style={{ width: `${percent}%` }} />;
+                        })()}
+                      </div>
+                    </div>
+                    <div className="controls" style={{ marginLeft: 12 }}>
+                      <button onClick={() => toggleExplain(key)}>{isOpen ? 'Hide' : '?'}</button>
+                    </div>
+                  </div>
+                  {isOpen && (
+                    <div className="llm-explanation" style={{ marginTop: 10 }}>
                       {(() => {
                         const maxScore = getMaxScoreFromScoringLogic(indicator['Scoring Logic']);
                         const safeMax = maxScore && maxScore > 0 ? maxScore : 5;
-                        const percent = Math.max(0, Math.min(100, (value / safeMax) * 100));
-                        return <div className="progress" style={{ width: `${percent}%` }} />;
+                        return (
+                          <div>
+                            <div style={{ fontWeight: 700, marginBottom: 6 }}>Score: {value} / {safeMax}</div>
+                            {indicator['Rationale'] && (
+                              <div style={{ marginBottom: 8 }}><strong>Why are we asking this?</strong> {indicator['Rationale']}</div>
+                            )}
+                            {indicator['Legend'] && (
+                              <div>
+                                {parseLegend(indicator['Legend']).map((it, idx) => (
+                                  <div key={idx} style={{ marginBottom: 4 }}>
+                                    <strong>{it.title}</strong>{it.desc ? ` – ${it.desc}` : ''}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
                       })()}
                     </div>
-                  </div>
-                  <div className="controls" style={{ marginLeft: 12 }}>
-                    <button onClick={() => toggleExplain(key)}>{isOpen ? 'Hide' : '?'}</button>
-                  </div>
-                </div>
-                {isOpen && (
-                  <div className="llm-explanation" style={{ marginTop: 10 }}>
-                    {(() => {
-                      const maxScore = getMaxScoreFromScoringLogic(indicator['Scoring Logic']);
-                      const safeMax = maxScore && maxScore > 0 ? maxScore : 5;
-                      return (
-                        <div>
-                          <div style={{ fontWeight: 700, marginBottom: 6 }}>Score: {value} / {safeMax}</div>
-                          {indicator['Rationale'] && (
-                            <div style={{ marginBottom: 8 }}><strong>Why are we asking this?</strong> {indicator['Rationale']}</div>
-                          )}
-                          {indicator['Legend'] && (
-                            <div>
-                              {parseLegend(indicator['Legend']).map((it, idx) => (
-                                <div key={idx} style={{ marginBottom: 4 }}>
-                                  <strong>{it.title}</strong>{it.desc ? ` – ${it.desc}` : ''}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })()}
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
 
-      <div className="section" style={{ marginTop: 16 }}>
-        <BadgeGenerator companyId={companyId} />
-      </div>
-
-      <div className="controls" style={{ marginTop: 24, textAlign: 'center' }}>
-        <button onClick={handleDelete}>Delete Organisation</button>
+      <div className={`tab-content ${activeTab === 'badge' ? 'active' : ''}`}>
+        <div className="section" style={{ marginTop: 16 }}>
+          <BadgeGenerator companyId={companyId} />
+        </div>
       </div>
     </div>
   );
