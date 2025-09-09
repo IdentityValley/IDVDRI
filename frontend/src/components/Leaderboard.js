@@ -49,9 +49,6 @@ function Leaderboard() {
   return (
     <div className="leaderboard">
       <h2>Organisation Leaderboard</h2>
-      <p style={{ fontSize: '12px', color: '#666', marginBottom: '16px' }}>
-        Debug: Checking Supabase table schema...
-      </p>
       <div className="vertical-leaderboard">
         {companies.map((company, index) => {
           const getRankDisplay = (rank) => `#${rank}`;
