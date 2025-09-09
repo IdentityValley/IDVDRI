@@ -282,6 +282,11 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   51%, 100% { opacity: 0; }
 }
 
+/* Desktop - hide inline rank text */
+.company-info .rank-text {
+  display: none;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .container {
@@ -335,6 +340,11 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
     font-weight: 700;
     color: #000;
     margin-right: 8px;
+  }
+  
+  /* Hide rank text on desktop, show on mobile */
+  .company-info .rank-text {
+    display: inline;
   }
   
   .score-display {
