@@ -323,15 +323,18 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   }
   
   .rank-badge {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    z-index: 1;
+    display: none;
   }
   
   .company-info {
     text-align: center;
-    margin-top: 20px;
+    margin-top: 0;
+  }
+  
+  .company-info .rank-text {
+    font-weight: 700;
+    color: var(--accent);
+    margin-right: 8px;
   }
   
   .score-display {
@@ -447,15 +450,11 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   }
   
   .rank-badge {
-    font-size: 14px;
-    width: 30px;
-    height: 30px;
-    top: 12px;
-    left: 12px;
+    display: none;
   }
   
   .company-info {
-    margin-top: 15px;
+    margin-top: 0;
   }
   
   .score-value {
