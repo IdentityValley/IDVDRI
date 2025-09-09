@@ -10,6 +10,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+        {/* Version: 1.1.0 - Force cache refresh */}
         <header className="App-header">
           <div className="container navbar">
             <div className="brand">
@@ -37,7 +38,12 @@ function App() {
             </section>
           </div>
         </main>
-        <footer className="footer">© {new Date().getFullYear()} DRI</footer>
+        <footer className="footer">
+          © {new Date().getFullYear()} DRI | 
+          <a href="https://identityvalley.eu" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>
+            A project by Identity Valley
+          </a>
+        </footer>
       </div>
     </Router>
   );
