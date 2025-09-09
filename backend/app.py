@@ -11,7 +11,7 @@ except Exception:
     _vertex_available = False
 
 app = Flask(__name__)
-CORS(app) # Enable CORS for all routes
+CORS(app, origins=['*']) # Enable CORS for all routes and origins
 
 # --- Supabase client (optional) ---
 SUPABASE_URL = os.getenv('SUPABASE_URL')
@@ -347,12 +347,17 @@ companies_data = [compute_scores(c) for c in companies_data]
 def serve_index():
     return send_from_directory('../frontend/public', 'index.html')
 
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "ok", "indicators_count": len(INDICATORS_STATIC)})
+
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory('../frontend/public', path)
 
 @app.route('/api/indicators', methods=['GET'])
 def get_indicators():
+    print(f"Indicators requested, returning {len(INDICATORS_STATIC)} indicators")
     return jsonify(INDICATORS_STATIC)
 
 @app.route('/api/companies', methods=['GET'])
