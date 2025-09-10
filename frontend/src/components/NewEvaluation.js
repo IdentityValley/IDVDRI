@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { INDICATORS_FALLBACK } from '../indicators';
 import { addCompany } from '../storage';
 import { computeScores } from '../scoring';
+ 
 
 function parseScoring(scoringLogic) {
   if (!scoringLogic) return [];
@@ -51,6 +52,16 @@ function NewEvaluation() {
   const [companyName, setCompanyName] = useState('');
   const [scores, setScores] = useState({});
   const [indicators, setIndicators] = useState([]);
+  const PROOF_INDICATORS = [
+    'Digital Literacy Policy & Governance',
+    'Incident response plan',
+    'Security Certification/Compliance',
+    'Participation in Data Altruism',
+    'Algorithmic Impact Assessments Conducted',
+    'Clear Privacy Policy & Data Use Disclosure',
+    'Public Digital Ethics Principles Published'
+  ];
+  const [proofsDraft, setProofsDraft] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -111,6 +122,13 @@ function NewEvaluation() {
       scores: scores,
     };
     try {
+      // Persist mock proofs for this company id
+      const persisted = {};
+      PROOF_INDICATORS.forEach(name => {
+        const entry = proofsDraft[name];
+        persisted[name] = entry ? { uploaded: true, verified: false, filename: entry.filename || 'uploaded_document.pdf' } : { uploaded: false, verified: false, filename: '' };
+      });
+      try { localStorage.setItem(`proofs:${newCompany.id}`, JSON.stringify(persisted)); } catch (e) {}
       await addCompany(newCompany);
       navigate('/');
     } catch (error) {
@@ -183,6 +201,33 @@ function NewEvaluation() {
                                 <option key={String(opt.value)} value={opt.value}>{opt.value} – {opt.label}</option>
                               ))}
                             </select>
+                            {PROOF_INDICATORS.includes(name) && (
+                              <div style={{ marginTop: 8, display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                                {proofsDraft[name]?.uploaded ? (
+                                  <>
+                                    <span className="badge success" style={{ padding: '4px 8px', fontSize: 12 }}>Uploaded</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => setProofsDraft(prev => ({ ...prev, [name]: { uploaded: true, filename: 'uploaded_document_v2.pdf' } }))}
+                                      title="Replace file (mock)"
+                                      style={{ padding: '6px 10px', fontSize: 12 }}
+                                    >
+                                      Replace file
+                                    </button>
+                                  </>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    disabled={!companyName}
+                                    onClick={() => setProofsDraft(prev => ({ ...prev, [name]: { uploaded: true, filename: 'uploaded_document.pdf' } }))}
+                                    title={companyName ? 'Upload a proof document (mock)' : 'Enter organisation name first'}
+                                    style={{ padding: '6px 10px', fontSize: 12 }}
+                                  >
+                                    Upload proof
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                         {legend && (

@@ -1,0 +1,90 @@
+﻿DRG;Criterion/Metric Name;Information Sources
+;Digital Literacy Policy & Governance;"The European Digital Competence Framework for Citizens https://ec.europa.eu/social/BlobServlet?docId=15688&langId=en
+DigComp framework https://joint-research-centre.ec.europa.eu/digcomp_en"
+;Capacity building;"EU Digital Skills and Jobs Coalition https://digital-strategy.ec.europa.eu/en/policies/digital-skills-coalition
+Digital Skills and Jobs Platform  "
+;Multilingual & Clear Communication;"Plain Language Network https://plainlanguagenetwork.org/
+EU Publication How to write clearly https://op.europa.eu/en/publication-detail/-/publication/725b7eb0-d92e-11e5-8fea-01aa75ed71a1"
+;Security Certification/Compliance;"EU Cybersecurity Certification Policy https://digital-strategy.ec.europa.eu/en/policies/cybersecurity-certification-framework
+ENISA EU Cybersecurity Certification https://certification.enisa.europa.eu/"
+;Security Awareness Training Coverage;"ENISA Skills and Competences for Companies https://www.enisa.europa.eu/topics/skills-and-competences-for-companies
+ENISA Awareness and Cyberhygiene https://www.enisa.europa.eu/topics/awareness-and-cyber-hygiene"
+;Incident response plan;ENISA EU Incident Response and Cyber Crime Managment  https://www.enisa.europa.eu/topics/eu-incident-response-and-cyber-crisis-management
+;Data Subject Requests (Volume & Response Time);EDPB Personal Data Protection https://www.edpb.europa.eu/sme-data-protection-guide/respect-individuals-rights_en
+;Privacy Governance & Accountability;"EU Business Data Protection Compliance https://europa.eu/youreurope/business/dealing-with-customers/data-protection/ 
+Data protection under GDPR https://europa.eu/youreurope/business/dealing-with-customers/data-protection/data-protection-gdpr/index_en.htm"
+;PET adoption;"OECD Privacy Enhancing Technologies https://www.oecd.org/en/topics/privacy-enhancing-technologies.html
+European Commission Privacy Enhancing Technologies https://ec.europa.eu/commission/presscorner/detail/en/memo_07_159"
+;User Consent and Preference Management;"EDPB Guidelines on consent https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en
+European consent management platform (CMP) https://european-alternatives.eu/category/consent-management-platform-cmp"
+;Interoperability & Portability;"OECD Data Portability, Interoperability and Digital Platform Competition https://www.oecd.org/content/dam/oecd/en/publications/reports/2021/10/data-portability-interoperability-and-competition_f09a402e/73a083a9-en.pdf
+ICO Right to data portability https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/individual-rights/individual-rights/right-to-data-portability/"
+;Participation in Data Altruism;"Data Governance Act https://digital-strategy.ec.europa.eu/en/policies/data-governance-act
+Guide to  Data Governance Act https://digital-strategy.ec.europa.eu/en/library/new-practical-guide-data-governance-act"
+;Algorithmic Impact Assessments Conducted;"EU AI Ethics Guidelines https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai 
+IFOW Good Work Algorithmic Impact Assessment https://www.gov.uk/ai-assurance-techniques/ifow-good-work-algorithmic-impact-assessment"
+;AI Ethics Board & Oversight;How to Form an AI Ethics Board for Responsible AI Development https://shelf.io/blog/how-to-form-an-ai-ethics-board-for-responsible-ai-development/
+;Public Digital Ethics Principles Published;"DSA Transparency Requirements https://digital-strategy.ec.europa.eu/en/policies/dsa-brings-transparency
+Digital ethics: definition and examples https://smowl.net/en/blog/digital-ethics/"
+;Clear Privacy Policy & Data Use Disclosure;Privacy Policy Template for Legal Compliance https://www.cookieyes.com/blog/privacy-policy-template/
+;Open Communication Channels;LiveAgent Support Channel Example https://www.liveagent.com/customer-support-glossary/support-channel/
+;Stakeholder Engagement;"Stakeholder Groups and How to Engage Them Effectively https://simplystakeholders.com/stakeholder-groups/
+Ensuring Effective Stakeholder Engagement https://www.communications.gov.uk/publications/ensuring-effective-stakeholder-engagement/"
+;Sustainable Development Goals;"UN Sustainable Development Goals (SDGs) https://sdgs.un.org/goals
+Companies working otn the SDGs https://medium.com/impossible/17-top-companies-working-on-the-uns-sustainable-development-goals-49e3eaa75ee1
+Ideas for Companies to help achieve the 17 SDGs https://www.17goalsmagazin.de/en/17-steps-companies-can-take-now-to-achieve-the-sdgs/"
+;Board-Level Digital-Risk Governance;"How Corporate Boards Should Handle Technology Governance
+https://www.surestepsi.com/resource/how-corporate-boards-should-handle-technology-governance
+Principles for Board
+Governance of Cyber Risk https://www3.weforum.org/docs/WEF_Cyber_Risk_Corporate_Governance_2021.pdf"
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;"• WAVE Web Accessibility (https://wave.webaim.org/)
+• axe DevTools (https://www.deque.com/axe/devtools/)
+• Lighthouse Accessibility (https://developers.google.com/web/tools/lighthouse)
+• Pa11y Command Line Tool (https://pa11y.org/)"
+;;"• HackerOne Bug Bounty (https://www.hackerone.com/)
+• Bugcrowd Platform (https://www.bugcrowd.com/)
+• Intigriti Bug Bounty (https://www.intigriti.com/)
+• YesWeHack Bug Bounty (https://www.yeswehack.com/)"
+;;"• SANS Security Culture Survey (https://www.sans.org/white-papers/)
+• KnowBe4 Security Culture (https://www.knowbe4.com/organizational-security-culture)
+• Proofpoint Security Awareness (https://www.proofpoint.com/us/products/security-awareness-training)
+• SecurityAdvisor Culture Assessment (https://www.securityadvisor.io/)"
+;;"• SecurityScorecard (https://securityscorecard.com/)
+• BitSight Security Ratings (https://www.bitsight.com/)
+• RiskRecon (https://www.riskrecon.com/)
+• UpGuard Vendor Risk (https://www.upguard.com/)"
+;;"• OneTrust Privacy Impact Assessments (https://www.onetrust.com/products/privacy-impact-assessments/)
+• TrustArc PIA Tools (https://trustarc.com/privacy-compliance-technology/privacy-impact-assessments/)
+• Microsoft Privacy Impact Assessment (https://compliance.microsoft.com/)
+• GDPR.eu PIA Template (https://gdpr.eu/privacy-impact-assessment-template/)"
+;;"• Pingdom Website Monitoring (https://www.pingdom.com/)
+• UptimeRobot (https://uptimerobot.com/)
+• StatusPage by Atlassian (https://www.statuspage.io/)
+• Datadog Infrastructure Monitoring (https://www.datadoghq.com/)"
+;;"• Diligent Boards (https://www.diligent.com/)
+• BoardEffect (https://www.boardeffect.com/)
+• OnBoard Board Management (https://www.passageways.com/)
+• Govenda Board Portal (https://www.govenda.com/)"

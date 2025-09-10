@@ -6,6 +6,7 @@ import CompanyProfile from './components/CompanyProfile';
 import NewEvaluation from './components/NewEvaluation';
 import About from './components/About';
 import Contact from './components/Contact';
+import Resources from './components/Resources';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <ul>
                 <li><Link to="/">Leaderboard</Link></li>
                 <li><Link to="/new-evaluation">New Evaluation</Link></li>
+                <li><Link to="/resources">Resources</Link></li>
                 <li><Link to="/about">About</Link></li>
                 <li><Link to="/contact">Contact</Link></li>
               </ul>
@@ -35,6 +37,7 @@ function App() {
                 <Route path="/" element={<Leaderboard />} />
                 <Route path="/company/:companyId" element={<CompanyProfile />} />
                 <Route path="/new-evaluation" element={<NewEvaluation />} />
+                <Route path="/resources" element={<Resources />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
               </Routes>
