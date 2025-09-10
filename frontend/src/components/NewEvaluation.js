@@ -52,6 +52,7 @@ function NewEvaluation() {
   const [companyName, setCompanyName] = useState('');
   const [scores, setScores] = useState({});
   const [indicators, setIndicators] = useState([]);
+  const [openWhy, setOpenWhy] = useState({});
   const PROOF_INDICATORS = [
     'Digital Literacy Policy & Governance',
     'Incident response plan',
@@ -186,6 +187,51 @@ function NewEvaluation() {
                           <div style={{ flex: 2, minWidth: 260 }}>
                             <div style={{ fontWeight: 600 }}>{name}</div>
                             <div className="helper evaluation-question">{indicator['Question']}</div>
+                            {indicator['Rationale'] && (
+                              <div
+                                style={{ margin: '8px 0', position: 'relative', display: 'inline-block' }}
+                                onMouseEnter={() => setOpenWhy(prev => ({ ...prev, [name]: true }))}
+                                onMouseLeave={() => setOpenWhy(prev => ({ ...prev, [name]: false }))}
+                              >
+                                <button
+                                  type="button"
+                                  onClick={() => setOpenWhy(prev => ({ ...prev, [name]: !prev[name] }))}
+                                  aria-expanded={!!openWhy[name]}
+                                  style={{
+                                    background: '#fff',
+                                    border: '2px solid #000',
+                                    padding: '10px 12px',
+                                    boxShadow: '3px 3px 0 #000',
+                                    fontSize: 12,
+                                    fontWeight: 700,
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  Why are we asking this?
+                                </button>
+                                {openWhy[name] && (
+                                  <div
+                                    role="tooltip"
+                                    style={{
+                                      position: 'absolute',
+                                      top: 'calc(100% + 8px)',
+                                      right: 0,
+                                      zIndex: 20,
+                                      background: '#fff',
+                                      border: '2px solid #000',
+                                      boxShadow: '6px 6px 0 #000',
+                                      padding: 12,
+                                      maxWidth: 420,
+                                      minWidth: 260
+                                    }}
+                                  >
+                                    <div style={{ color: '#000' }}>
+                                      <strong>Why are we asking this?</strong> {indicator['Rationale']}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                           <div style={{ flex: 1, minWidth: 220 }}>
                             <label className="label" htmlFor={`sel-${name}`}>Select level</label>
@@ -230,6 +276,7 @@ function NewEvaluation() {
                             )}
                           </div>
                         </div>
+                        {/* Tooltip replaces inline explanation */}
                         {legend && (
                           <div style={{ marginTop: 8 }}>
                             {parseLegend(legend).map((it, idx) => (

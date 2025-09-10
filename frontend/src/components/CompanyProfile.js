@@ -238,7 +238,7 @@ function CompanyProfile() {
               const proofStatus = (proofs || {})[key] || { uploaded: false, verified: false };
               return (
                 <li className="list-item" key={key} style={{ position: 'relative', flexDirection: 'column', alignItems: 'stretch' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between' }}>
+                  <div className="overview-row" style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between' }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span>{key}</span>
@@ -249,18 +249,17 @@ function CompanyProfile() {
                           </span>
                         )}
                       </div>
-                      <div className="helper">{indicator['Question']}</div>
+                      <div className="helper indicator-question">{indicator['Question']}</div>
                     </div>
-                    <div style={{ width: 280 }}>
-                      <div className="progress-wrap">
-                        {(() => {
-                          const maxScore = getMaxScoreFromScoringLogic(indicator['Scoring Logic']);
-                          const safeMax = maxScore && maxScore > 0 ? maxScore : 5;
-                          const percent = Math.max(0, Math.min(100, (value / safeMax) * 100));
-                          return <div className="progress" style={{ width: `${percent}%` }} />;
-                        })()}
-                      </div>
-                    </div>
+                    {(() => {
+                      const maxScore = getMaxScoreFromScoringLogic(indicator['Scoring Logic']);
+                      const safeMax = maxScore && maxScore > 0 ? maxScore : 5;
+                      return (
+                        <div className="helper" style={{ minWidth: 120, textAlign: 'right', fontWeight: 700, color: '#000' }}>
+                          Score: {value} / {safeMax}
+                        </div>
+                      );
+                    })()}
                     <div className="controls" style={{ marginLeft: 12, alignItems: 'center' }}>
                       <button onClick={() => toggleExplain(key)}>{isOpen ? 'Hide' : '?'}</button>
                     </div>

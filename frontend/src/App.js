@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import './App.css';
 import Leaderboard from './components/Leaderboard';
@@ -9,6 +9,7 @@ import Contact from './components/Contact';
 import Resources from './components/Resources';
 
 function App() {
+  const [navOpen, setNavOpen] = useState(false);
   return (
     <Router>
       <div className="App">
@@ -19,7 +20,10 @@ function App() {
               <div className="brand-mark" />
               <h1>Digital Responsibility Index</h1>
             </div>
-            <nav>
+            <button className="nav-toggle" aria-expanded={navOpen} aria-controls="primary-navigation" onClick={() => setNavOpen(v => !v)}>
+              Menu
+            </button>
+            <nav id="primary-navigation" className={navOpen ? 'open' : ''} onClick={() => setNavOpen(false)}>
               <ul>
                 <li><Link to="/">Leaderboard</Link></li>
                 <li><Link to="/new-evaluation">New Evaluation</Link></li>
