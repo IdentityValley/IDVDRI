@@ -302,6 +302,29 @@ button:active, .button:active { transform: translate(1px, 1px); box-shadow: 2px 
   51%, 100% { opacity: 0; }
 }
 
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+/* Sparse pulse once per 10s */
+@keyframes pulse-sparse {
+  0%, 94% { transform: scale(1); }
+  95% { transform: scale(1.12); }
+  96% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* Double pulse near the end of the cycle */
+@keyframes pulse-double {
+  0%, 80% { transform: scale(1); }
+  85% { transform: scale(1.12); }
+  88% { transform: scale(1); }
+  92% { transform: scale(1.12); }
+  95%, 100% { transform: scale(1); }
+}
+
 /* Desktop - hide inline rank text */
 .company-info .rank-text {
   display: none;

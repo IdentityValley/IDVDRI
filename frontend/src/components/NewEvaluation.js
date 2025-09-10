@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { INDICATORS_FALLBACK } from '../indicators';
 import { addCompany } from '../storage';
 import { computeScores } from '../scoring';
+import FeedbackBot from './FeedbackBot';
  
 
 function parseScoring(scoringLogic) {
@@ -142,6 +143,7 @@ function NewEvaluation() {
   return (
     <div className="new-evaluation">
       <h2 style={{ marginTop: 0 }}>New Organisation Evaluation</h2>
+      <FeedbackBot route="/new-evaluation" />
       <form onSubmit={handleSubmit}>
         <div className="field">
           <label className="label" htmlFor="companyName">Organisation Name</label>

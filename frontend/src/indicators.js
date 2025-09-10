@@ -1,7 +1,7 @@
 // Fallback indicators data - same as backend INDICATORS_STATIC
 export const INDICATORS_FALLBACK = [
   {
-    'Criterion/Metric Name': 'Digital Literacy Policy & Governance',
+    'Criterion/Metric Name': 'Accessibility Policy & Governance',
     'DRG Short Code': '1',
     'Question': 'To what extent does the organisation have a formal accessibility policy/strategy with an active governance body overseeing its implementation?',
     'Rationale': 'Policy and governance turn intentions into accountable practice, ensuring digital literacy efforts are resourced, coordinated, and sustained.',
