@@ -31,11 +31,11 @@ function Resources() {
             <div className="grid" style={{ marginTop: 8 }}>
               {sortedDrgs.map(drg => (
                 <div key={drg} className="card" style={{ gridColumn: 'span 12' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
                     <img
                       src={`${process.env.PUBLIC_URL}/DRG${drg}.png`}
                       alt={`DRG ${drg}`}
-                      style={{ width: 20, height: 20 }}
+                      style={{ width: 52, height: 52 }}
                     />
                     <div style={{ fontWeight: 600 }}>DRG #{drg}</div>
                   </div>
