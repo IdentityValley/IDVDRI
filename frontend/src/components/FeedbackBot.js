@@ -24,7 +24,7 @@ export default function FeedbackBot({
   temperature,
   maxTokens,
   systemPrompt,
-  backendBaseUrl = 'http://127.0.0.1:5000'
+  backendBaseUrl = ''
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState(() => [{ role: 'assistant', content: INITIAL_PROMPT }]);
