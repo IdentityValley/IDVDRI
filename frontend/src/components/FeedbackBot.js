@@ -114,9 +114,13 @@ export default function FeedbackBot({
       // Persist feedback via backend to keep keys server-side (always send for now)
       try {
         const feedbackUrl = apiBase.includes('/functions/v1') ? `${apiBase}/feedback` : `${apiBase}/api/feedback`;
+        const isFunction2 = apiBase.includes('/functions/v1');
+        const commonHeaders2 = isFunction2
+          ? { 'Content-Type': 'application/json', 'apikey': supabaseAnonKey }
+          : { 'Content-Type': 'application/json' };
         const resp = await fetch(feedbackUrl, {
           method: 'POST',
-          headers: commonHeaders,
+          headers: commonHeaders2,
           body: JSON.stringify({
             session_id: sessionId,
             route,
