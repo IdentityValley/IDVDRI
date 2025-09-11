@@ -38,7 +38,7 @@ function cors(req: Request, resp: Response) {
   const headers = new Headers(resp.headers);
   headers.set("Access-Control-Allow-Origin", origin);
   headers.set("Vary", "Origin");
-  headers.set("Access-Control-Allow-Headers", "Content-Type, apikey, x-client-info, prefer");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, apikey, x-client-info, prefer");
   headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   headers.set("Access-Control-Max-Age", "86400");
   return new Response(resp.body, { status: resp.status, headers });

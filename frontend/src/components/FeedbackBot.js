@@ -67,7 +67,7 @@ export default function FeedbackBot({
       // If using Supabase Edge Function, POST to base and pass action to avoid blocked paths
       const usingFunction = apiBase.includes('/functions/v1');
       const chatUrl = usingFunction ? `${apiBase}` : `${apiBase}/api/llm/chat`;
-      const commonHeaders = usingFunction ? { 'Content-Type': 'text/plain' } : { 'Content-Type': 'application/json' };
+      const commonHeaders = usingFunction ? { 'Content-Type': 'text/plain', 'Authorization': `Bearer ${supabaseAnonKey}`, 'apikey': supabaseAnonKey } : { 'Content-Type': 'application/json' };
       const res = await fetch(chatUrl, {
         method: 'POST',
         headers: commonHeaders,
@@ -114,7 +114,7 @@ export default function FeedbackBot({
       try {
         const usingFunction2 = apiBase.includes('/functions/v1');
         const feedbackUrl = usingFunction2 ? `${apiBase}` : `${apiBase}/api/feedback`;
-        const commonHeaders2 = usingFunction2 ? { 'Content-Type': 'text/plain' } : { 'Content-Type': 'application/json' };
+        const commonHeaders2 = usingFunction2 ? { 'Content-Type': 'text/plain', 'Authorization': `Bearer ${supabaseAnonKey}`, 'apikey': supabaseAnonKey } : { 'Content-Type': 'application/json' };
         const resp = await fetch(feedbackUrl, {
           method: 'POST',
           headers: commonHeaders2,
