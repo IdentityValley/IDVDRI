@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { supabase } from '../supabase';
+import { supabase, supabaseAnonKey } from '../supabase';
 
 function getOrCreateSessionId() {
   try {
@@ -66,9 +66,13 @@ export default function FeedbackBot({
       console.log('Calling LLM API with:', { userText, route, indicatorName, sessionId });
       // If using Supabase Edge Function, allow direct function path
       const chatUrl = apiBase.includes('/functions/v1') ? `${apiBase}/chat` : `${apiBase}/api/llm/chat`;
+      const isFunction = apiBase.includes('/functions/v1');
+      const commonHeaders = isFunction
+        ? { 'Content-Type': 'application/json', 'apikey': supabaseAnonKey, 'Authorization': `Bearer ${supabaseAnonKey}` }
+        : { 'Content-Type': 'application/json' };
       const res = await fetch(chatUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: commonHeaders,
         body: JSON.stringify({
           messages: [{ role: 'user', content: userText }],
           context: { route, indicator_name: indicatorName, drg_short_code: drgShortCode, session_id: sessionId, asked_followup: askedFollowupRef.current },
@@ -112,7 +116,7 @@ export default function FeedbackBot({
         const feedbackUrl = apiBase.includes('/functions/v1') ? `${apiBase}/feedback` : `${apiBase}/api/feedback`;
         const resp = await fetch(feedbackUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: commonHeaders,
           body: JSON.stringify({
             session_id: sessionId,
             route,
