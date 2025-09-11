@@ -64,7 +64,9 @@ export default function FeedbackBot({
   const callLLM = async (userText) => {
     try {
       console.log('Calling LLM API with:', { userText, route, indicatorName, sessionId });
-      const res = await fetch(`${apiBase}/api/llm/chat`, {
+      // If using Supabase Edge Function, allow direct function path
+      const chatUrl = apiBase.includes('/functions/v1') ? `${apiBase}/chat` : `${apiBase}/api/llm/chat`;
+      const res = await fetch(chatUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -107,7 +109,8 @@ export default function FeedbackBot({
 
       // Persist feedback via backend to keep keys server-side (always send for now)
       try {
-        const resp = await fetch(`${apiBase}/api/feedback`, {
+        const feedbackUrl = apiBase.includes('/functions/v1') ? `${apiBase}/feedback` : `${apiBase}/api/feedback`;
+        const resp = await fetch(feedbackUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
