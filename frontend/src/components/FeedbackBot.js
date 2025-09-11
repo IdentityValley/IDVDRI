@@ -68,7 +68,7 @@ export default function FeedbackBot({
       const chatUrl = apiBase.includes('/functions/v1') ? `${apiBase}/chat` : `${apiBase}/api/llm/chat`;
       const isFunction = apiBase.includes('/functions/v1');
       const commonHeaders = isFunction
-        ? { 'Content-Type': 'application/json', 'apikey': supabaseAnonKey, 'Authorization': `Bearer ${supabaseAnonKey}` }
+        ? { 'Content-Type': 'application/json', 'apikey': supabaseAnonKey }
         : { 'Content-Type': 'application/json' };
       const res = await fetch(chatUrl, {
         method: 'POST',
