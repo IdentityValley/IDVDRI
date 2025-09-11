@@ -19,8 +19,9 @@ const CHAT_SYSTEM_PROMPT = Deno.env.get("CHAT_SYSTEM_PROMPT") || (
   "Keep answers brief (1–3 sentences), warm in tone, and avoid links."
 );
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
-const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+// Note: Supabase blocks secrets starting with SUPABASE_. Use custom names.
+const SUPABASE_PROJECT_URL = Deno.env.get("PROJECT_URL") || "";
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY") || "";
 
 const DRG_SUMMARIES: Record<string, string> = {
   "1": "Digital Literacy: Prerequisite for sovereign, self-determined use of digital tech; competent access and skills.",
@@ -129,11 +130,11 @@ async function handleFeedback(req: Request): Promise<Response> {
   if (!record.session_id || !record.route || !record.message) {
     return err("Missing required fields", 400);
   }
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  if (!SUPABASE_PROJECT_URL || !SUPABASE_SERVICE_ROLE_KEY) {
     return err("Supabase not configured for server-side insert", 500);
   }
   try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
+    const supabase = createClient(SUPABASE_PROJECT_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
     const { error } = await supabase.from("feedback").insert([record]);
     if (error) return err(error.message, 500);
     return ok({ saved: true }, 201);

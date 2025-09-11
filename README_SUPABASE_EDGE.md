@@ -7,13 +7,13 @@ Setup
    supabase link --project-ref pyvcwxkqtqmqwykayrto
 
 Secrets
-3) Set secrets (never commit keys):
+3) Set secrets (never commit keys). Note: names cannot start with SUPABASE_. Use:
    supabase secrets set \
      OPENAI_API_KEY=YOUR_KEY \
      CHAT_SYSTEM_PROMPT="You are a friendly, concise assistant..." \
      CHAT_TEMPERATURE=0.2 CHAT_MAX_TOKENS=256 CHAT_MODEL=gpt-4o-mini \
-     SUPABASE_URL=https://pyvcwxkqtqmqwykayrto.supabase.co \
-     SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
+     PROJECT_URL=https://pyvcwxkqtqmqwykayrto.supabase.co \
+     SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
 
 Deploy
 4) Deploy function:
