@@ -147,6 +147,36 @@ DRG_SUMMARIES = {
     '7': 'Human Agency & Identity: Protect identity, preserve human responsibility; human-centered, inclusive, ethical, sustainable.',
 }
 
+# Optional detailed DRG context (long-form)
+def _load_drg_context() -> dict:
+    mapping = {}
+    try:
+        base_dir = os.path.dirname(__file__)
+        path = os.path.join(base_dir, 'drg_context.md')
+        if os.path.exists(path):
+            with open(path, 'r', encoding='utf-8') as f:
+                text = f.read()
+            # Expect sections like: \n## DRG1\n...paragraphs...
+            current = None
+            lines = text.splitlines()
+            for line in lines:
+                if line.strip().lower().startswith('## drg'):
+                    # Extract number after DRG
+                    import re
+                    m = re.search(r'drg\s*#?\s*(\d+)', line, re.I)
+                    if m:
+                        current = m.group(1)
+                        mapping[current] = []
+                elif current:
+                    mapping[current].append(line)
+            for k in list(mapping.keys()):
+                mapping[k] = ("\n".join(mapping[k]).strip())[:4000]
+    except Exception:
+        pass
+    return mapping
+
+DRG_DETAILS = _load_drg_context()
+
 @app.route('/')
 def serve_index():
     return send_from_directory('../frontend/build', 'index.html')
@@ -311,6 +341,44 @@ def llm_chat():
         for m in tail:
             role = 'user' if m.get('role') == 'user' else 'assistant'
             oai_messages.append({"role": role, "content": m.get('content', '')[:2000]})
+
+        # If the latest user message appears to ask about a DRG by name/number, inject detail
+        try:
+            import re
+            last_user = None
+            for m in reversed(tail):
+                if m.get('role') == 'user':
+                    last_user = m.get('content', '')
+                    break
+            if last_user:
+                # Match patterns: DRG1, DRG 1, Digital Literacy, Privacy, Cybersecurity, etc.
+                patterns = [
+                    (r'\bdrg\s*#?\s*([1-7])\b', None),
+                    (r'\bdigital\s+literacy\b', '1'),
+                    (r'\bcyber\s*security|cybersecurity\b', '2'),
+                    (r'\bprivacy\b', '3'),
+                    (r'\bdata\s+fairness\b', '4'),
+                    (r'\btrustworthy\s+algorithms?\b', '5'),
+                    (r'\btransparency\b', '6'),
+                    (r'\bhuman\s+agency(\s+and\s+identity)?\b', '7'),
+                ]
+                found = None
+                for pat, static_num in patterns:
+                    m = re.search(pat, last_user, re.I)
+                    if m:
+                        found = static_num or m.group(1)
+                        break
+                if found:
+                    # Prefer long-form details if available; else one-liner summary
+                    detail = DRG_DETAILS.get(found)
+                    if detail:
+                        oai_messages.append({"role": "system", "content": f"Detailed DRG{found} context:\n{detail[:1500]}"})
+                    else:
+                        drg_sum = DRG_SUMMARIES.get(found)
+                        if drg_sum:
+                            oai_messages.append({"role": "system", "content": f"DRG{found} summary: {drg_sum}"})
+        except Exception:
+            pass
 
         if not OPENAI_API_KEY:
             # Fallback: canned reply when key is missing
