@@ -66,21 +66,40 @@ export default function FeedbackBot({
       console.log('Calling LLM API with:', { userText, route, indicatorName, sessionId });
       // If using Supabase Edge Function, POST to base and pass action to avoid blocked paths
       const usingFunction = apiBase.includes('/functions/v1');
-      const chatUrl = usingFunction ? `${apiBase}` : `${apiBase}/api/llm/chat`;
-      const commonHeaders = usingFunction ? { 'Content-Type': 'text/plain', 'Authorization': `Bearer ${supabaseAnonKey}`, 'apikey': supabaseAnonKey } : { 'Content-Type': 'application/json' };
-      const res = await fetch(chatUrl, {
-        method: 'POST',
-        headers: commonHeaders,
-        body: JSON.stringify({
-          ...(usingFunction ? { action: 'chat' } : {}),
-          messages: [{ role: 'user', content: userText }],
-          context: { route, indicator_name: indicatorName, drg_short_code: drgShortCode, session_id: sessionId, asked_followup: askedFollowupRef.current },
-          ...(typeof maxTokens === 'number' ? { max_tokens: maxTokens } : {}),
-          ...(typeof temperature === 'number' ? { temperature } : {}),
-          ...(typeof model === 'string' && model ? { model } : {}),
-          ...(typeof systemPrompt === 'string' && systemPrompt ? { system_prompt: systemPrompt } : {}),
-        })
-      });
+      let res;
+      if (usingFunction) {
+        // Use Supabase client to handle headers/CORS for Edge Functions
+        const { data, error } = await supabase.functions.invoke(
+          apiBase.split('/functions/v1/')[1] || 'feedback-bot',
+          {
+            body: {
+              action: 'chat',
+              messages: [{ role: 'user', content: userText }],
+              context: { route, indicator_name: indicatorName, drg_short_code: drgShortCode, session_id: sessionId, asked_followup: askedFollowupRef.current },
+              ...(typeof maxTokens === 'number' ? { max_tokens: maxTokens } : {}),
+              ...(typeof temperature === 'number' ? { temperature } : {}),
+              ...(typeof model === 'string' && model ? { model } : {}),
+              ...(typeof systemPrompt === 'string' && systemPrompt ? { system_prompt: systemPrompt } : {}),
+            }
+          }
+        );
+        if (error) throw error;
+        return (data && data.reply) ? data.reply : 'Thanks for sharing. Could you add one concrete example or suggestion?';
+      } else {
+        const chatUrl = `${apiBase}/api/llm/chat`;
+        res = await fetch(chatUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [{ role: 'user', content: userText }],
+            context: { route, indicator_name: indicatorName, drg_short_code: drgShortCode, session_id: sessionId, asked_followup: askedFollowupRef.current },
+            ...(typeof maxTokens === 'number' ? { max_tokens: maxTokens } : {}),
+            ...(typeof temperature === 'number' ? { temperature } : {}),
+            ...(typeof model === 'string' && model ? { model } : {}),
+            ...(typeof systemPrompt === 'string' && systemPrompt ? { system_prompt: systemPrompt } : {}),
+          })
+        });
+      }
       console.log('LLM API response status:', res.status);
       const data = await res.json();
       console.log('LLM API response data:', data);
@@ -112,31 +131,50 @@ export default function FeedbackBot({
 
       // Persist feedback via backend to keep keys server-side (always send for now)
       try {
-        const usingFunction2 = apiBase.includes('/functions/v1');
-        const feedbackUrl = usingFunction2 ? `${apiBase}` : `${apiBase}/api/feedback`;
-        const commonHeaders2 = usingFunction2 ? { 'Content-Type': 'text/plain', 'Authorization': `Bearer ${supabaseAnonKey}`, 'apikey': supabaseAnonKey } : { 'Content-Type': 'application/json' };
-        const resp = await fetch(feedbackUrl, {
-          method: 'POST',
-          headers: commonHeaders2,
-          body: JSON.stringify({
-            ...(usingFunction2 ? { action: 'feedback' } : {}),
-            session_id: sessionId,
-            route,
-            indicator_name: indicatorName || null,
-            drg_short_code: drgShortCode || null,
-            feedback_type: indicatorName ? 'clarify_question' : 'general',
-            message: text,
-            assistant_message: assistant,
-            consent: true,
-            device,
-            viewport_w: viewportWidth,
-          })
-        });
-        const payload = await resp.json().catch(()=>({}));
-        if (!resp.ok || payload.saved === false) {
-          console.warn('Feedback save response:', resp.status, payload);
-          const msg = payload && payload.error ? String(payload.error) : 'Could not save feedback.';
-          setLastError(msg);
+        if (apiBase.includes('/functions/v1')) {
+          const { data, error } = await supabase.functions.invoke(
+            apiBase.split('/functions/v1/')[1] || 'feedback-bot',
+            {
+              body: {
+                action: 'feedback',
+                session_id: sessionId,
+                route,
+                indicator_name: indicatorName || null,
+                drg_short_code: drgShortCode || null,
+                feedback_type: indicatorName ? 'clarify_question' : 'general',
+                message: text,
+                assistant_message: assistant,
+                consent: true,
+                device,
+                viewport_w: viewportWidth,
+              }
+            }
+          );
+          if (error) setLastError(String(error.message || error));
+        } else {
+          const feedbackUrl = `${apiBase}/api/feedback`;
+          const resp = await fetch(feedbackUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              session_id: sessionId,
+              route,
+              indicator_name: indicatorName || null,
+              drg_short_code: drgShortCode || null,
+              feedback_type: indicatorName ? 'clarify_question' : 'general',
+              message: text,
+              assistant_message: assistant,
+              consent: true,
+              device,
+              viewport_w: viewportWidth,
+            })
+          });
+          const payload = await resp.json().catch(()=>({}));
+          if (!resp.ok || payload.saved === false) {
+            console.warn('Feedback save response:', resp.status, payload);
+            const msg = payload && payload.error ? String(payload.error) : 'Could not save feedback.';
+            setLastError(msg);
+          }
         }
         // No auto thank-you message; UX decided to keep convo natural
       } catch (err) {
