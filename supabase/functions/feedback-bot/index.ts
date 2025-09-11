@@ -33,20 +33,23 @@ const DRG_SUMMARIES: Record<string, string> = {
   "7": "Human Agency & Identity: Protect identity and preserve human responsibility; human-centered and inclusive.",
 };
 
-function cors(resp: Response) {
+function cors(req: Request, resp: Response) {
+  const origin = req.headers.get("origin") || "*";
   const headers = new Headers(resp.headers);
-  headers.set("Access-Control-Allow-Origin", "*");
-  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, apikey");
+  headers.set("Access-Control-Allow-Origin", origin);
+  headers.set("Vary", "Origin");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, apikey, x-client-info, prefer");
   headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  headers.set("Access-Control-Max-Age", "86400");
   return new Response(resp.body, { status: resp.status, headers });
 }
 
-function ok(data: any, init?: number) {
-  return cors(new Response(JSON.stringify(data), { status: init || 200, headers: { "Content-Type": "application/json" } }));
+function ok(req: Request, data: any, init?: number) {
+  return cors(req, new Response(JSON.stringify(data), { status: init || 200, headers: { "Content-Type": "application/json" } }));
 }
 
-function err(message: string, init?: number) {
-  return cors(new Response(JSON.stringify({ error: message }), { status: init || 400, headers: { "Content-Type": "application/json" } }));
+function err(req: Request, message: string, init?: number) {
+  return cors(req, new Response(JSON.stringify({ error: message }), { status: init || 400, headers: { "Content-Type": "application/json" } }));
 }
 
 async function handleChat(req: Request): Promise<Response> {
@@ -90,7 +93,7 @@ async function handleChat(req: Request): Promise<Response> {
   });
 
   if (!OPENAI_API_KEY) {
-    return ok({ reply: "Thanks for sharing. Could you add one concrete example or suggestion?" });
+    return ok(req, { reply: "Thanks for sharing. Could you add one concrete example or suggestion?" });
   }
 
   try {
@@ -103,13 +106,13 @@ async function handleChat(req: Request): Promise<Response> {
       body: JSON.stringify({ model, messages: oaiMessages, max_tokens: maxTokens, temperature }),
     });
     if (!resp.ok) {
-      return ok({ reply: "Thanks for sharing. Could you add one concrete example or suggestion?" });
+      return ok(req, { reply: "Thanks for sharing. Could you add one concrete example or suggestion?" });
     }
     const data = await resp.json();
     const content = data?.choices?.[0]?.message?.content?.trim() || "Thanks for sharing. Could you add one concrete example or suggestion?";
-    return ok({ reply: content });
+    return ok(req, { reply: content });
   } catch (_e) {
-    return ok({ reply: "Thanks for sharing. Could you add one concrete example or suggestion?" });
+    return ok(req, { reply: "Thanks for sharing. Could you add one concrete example or suggestion?" });
   }
 }
 
@@ -128,18 +131,18 @@ async function handleFeedback(req: Request): Promise<Response> {
     viewport_w: Number(body.viewport_w || 0) || null,
   };
   if (!record.session_id || !record.route || !record.message) {
-    return err("Missing required fields", 400);
+    return err(req, "Missing required fields", 400);
   }
   if (!SUPABASE_PROJECT_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    return err("Supabase not configured for server-side insert", 500);
+    return err(req, "Supabase not configured for server-side insert", 500);
   }
   try {
     const supabase = createClient(SUPABASE_PROJECT_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
     const { error } = await supabase.from("feedback").insert([record]);
-    if (error) return err(error.message, 500);
-    return ok({ saved: true }, 201);
+    if (error) return err(req, error.message, 500);
+    return ok(req, { saved: true }, 201);
   } catch (e: any) {
-    return err(String(e?.message || e), 500);
+    return err(req, String(e?.message || e), 500);
   }
 }
 
@@ -157,8 +160,8 @@ function routeFor(req: Request): "chat" | "feedback" | "unknown" {
 }
 
 export async function handler(req: Request): Promise<Response> {
-  if (req.method === "OPTIONS") return cors(new Response(null, { status: 204 }));
-  if (req.method !== "POST") return err("Only POST supported", 405);
+  if (req.method === "OPTIONS") return cors(req, new Response(null, { status: 204 }));
+  if (req.method !== "POST") return err(req, "Only POST supported", 405);
   const r = routeFor(req);
   if (r === "chat") return handleChat(req);
   if (r === "feedback") return handleFeedback(req);
@@ -166,7 +169,7 @@ export async function handler(req: Request): Promise<Response> {
   const body = await req.json().catch(() => ({}));
   if (body && body.action === "chat") return handleChat(new Request(req.url, { method: "POST", body: JSON.stringify(body) }));
   if (body && body.action === "feedback") return handleFeedback(new Request(req.url, { method: "POST", body: JSON.stringify(body) }));
-  return err("Unknown path. Use /chat or /feedback.", 404);
+  return err(req, "Unknown path. Use /chat or /feedback.", 404);
 }
 
 // Standard export for Supabase Edge Functions
