@@ -38,12 +38,23 @@ export default function FeedbackBot({
 
   const apiBase = useMemo(() => {
     if (backendBaseUrl) return backendBaseUrl;
+    // Prefer explicit global or env config when available
+    try {
+      if (typeof window !== 'undefined' && window.__API_BASE__) {
+        return String(window.__API_BASE__);
+      }
+    } catch (_) {}
+    if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_BASE) {
+      return String(process.env.REACT_APP_API_BASE);
+    }
+    // Same-origin when served via http(s)
     try {
       if (typeof window !== 'undefined') {
         const origin = window.location && window.location.origin;
         if (origin && !origin.startsWith('file:')) return origin;
       }
     } catch (_) {}
+    // Local fallback for file:// or dev usage
     return 'http://127.0.0.1:5000';
   }, [backendBaseUrl]);
 
