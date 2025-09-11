@@ -15,12 +15,24 @@ function getOrCreateSessionId() {
 
 const INITIAL_PROMPT = 'Hi! I\'m here to collect your feedback or clarify questions about the evaluation. What\'s on your mind?';
 
-export default function FeedbackBot({ route = '/new-evaluation', indicatorName = '', drgShortCode = '' }) {
+export default function FeedbackBot({
+  route = '/new-evaluation',
+  indicatorName = '',
+  drgShortCode = '',
+  // Optional LLM config overrides
+  model,
+  temperature,
+  maxTokens,
+  systemPrompt,
+  backendBaseUrl = 'http://127.0.0.1:5000'
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState(() => [{ role: 'assistant', content: INITIAL_PROMPT }]);
   const [input, setInput] = useState('');
   const [consent, setConsent] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [lastError, setLastError] = useState('');
+  const askedFollowupRef = useRef(false);
   const sessionId = useMemo(() => getOrCreateSessionId(), []);
   const panelRef = useRef(null);
 
@@ -30,14 +42,16 @@ export default function FeedbackBot({ route = '/new-evaluation', indicatorName =
   const callLLM = async (userText) => {
     try {
       console.log('Calling LLM API with:', { userText, route, indicatorName, sessionId });
-      const res = await fetch('http://127.0.0.1:5000/api/llm/chat', {
+      const res = await fetch(`${backendBaseUrl}/api/llm/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [{ role: 'user', content: userText }],
-          context: { route, indicator_name: indicatorName, session_id: sessionId },
-          max_tokens: 256,
-          temperature: 0.3
+          context: { route, indicator_name: indicatorName, drg_short_code: drgShortCode, session_id: sessionId, asked_followup: askedFollowupRef.current },
+          ...(typeof maxTokens === 'number' ? { max_tokens: maxTokens } : {}),
+          ...(typeof temperature === 'number' ? { temperature } : {}),
+          ...(typeof model === 'string' && model ? { model } : {}),
+          ...(typeof systemPrompt === 'string' && systemPrompt ? { system_prompt: systemPrompt } : {}),
         })
       });
       console.log('LLM API response status:', res.status);
@@ -54,6 +68,7 @@ export default function FeedbackBot({ route = '/new-evaluation', indicatorName =
   };
 
   const handleSend = async () => {
+    // Do not pre-mark follow-up; we will detect if assistant actually asked a question
     const text = input.trim();
     if (!text) return;
     setIsSending(true);
@@ -63,26 +78,43 @@ export default function FeedbackBot({ route = '/new-evaluation', indicatorName =
     try {
       const assistant = await callLLM(text);
       setMessages(prev => [...prev, { role: 'assistant', content: assistant }]);
+      // Heuristic: mark that we've had a follow-up if assistant asked a question
+      if (!askedFollowupRef.current && /\?\s*$/m.test(assistant)) {
+        askedFollowupRef.current = true;
+      }
 
-      // Optional: store to Supabase when consent is checked
-      if (consent && supabase) {
-        await supabase.from('feedback').insert([
-          {
+      // Persist feedback via backend to keep keys server-side (always send for now)
+      try {
+        const resp = await fetch(`${backendBaseUrl}/api/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             session_id: sessionId,
-            route: route,
+            route,
             indicator_name: indicatorName || null,
             drg_short_code: drgShortCode || null,
             feedback_type: indicatorName ? 'clarify_question' : 'general',
             message: text,
             assistant_message: assistant,
             consent: true,
-            device: device,
+            device,
             viewport_w: viewportWidth,
-          }
-        ]);
+          })
+        });
+        const payload = await resp.json().catch(()=>({}));
+        if (!resp.ok || payload.saved === false) {
+          console.warn('Feedback save response:', resp.status, payload);
+          const msg = payload && payload.error ? String(payload.error) : 'Could not save feedback.';
+          setLastError(msg);
+        }
+        // No auto thank-you message; UX decided to keep convo natural
+      } catch (err) {
+        console.warn('Feedback save failed:', err);
+        setLastError('Could not save feedback.');
       }
     } catch (e) {
       // Non-blocking error handling; keep chat flowing
+      setLastError('There was an issue contacting the assistant.');
     } finally {
       setIsSending(false);
     }
@@ -168,6 +200,9 @@ export default function FeedbackBot({ route = '/new-evaluation', indicatorName =
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {lastError && (
+              <div className="helper" style={{ color: '#b00020' }}>{lastError}</div>
+            )}
             <textarea
               rows={2}
               placeholder={indicatorName ? `Ask about: ${indicatorName}` : 'Type your feedback here...'}
@@ -177,7 +212,7 @@ export default function FeedbackBot({ route = '/new-evaluation', indicatorName =
             />
             <label className="helper" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-              Store my feedback anonymously (no personal data).
+              Store my feedback anonymously (no personal data). (Temporarily not required)
             </label>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
               <button

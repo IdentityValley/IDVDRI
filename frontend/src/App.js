@@ -7,6 +7,7 @@ import NewEvaluation from './components/NewEvaluation';
 import About from './components/About';
 import Contact from './components/Contact';
 import Resources from './components/Resources';
+import AdminFeedback from './components/AdminFeedback';
 
 function App() {
   const [navOpen, setNavOpen] = useState(false);
@@ -30,6 +31,7 @@ function App() {
                 <li><Link to="/resources">Resources</Link></li>
                 <li><Link to="/about">About</Link></li>
                 <li><Link to="/contact">Contact</Link></li>
+                <li><Link to="/admin/feedback">Feedback</Link></li>
               </ul>
             </nav>
           </div>
@@ -44,6 +46,7 @@ function App() {
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/admin/feedback" element={<AdminFeedback />} />
               </Routes>
             </section>
           </div>

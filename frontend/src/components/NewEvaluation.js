@@ -54,6 +54,8 @@ function NewEvaluation() {
   const [scores, setScores] = useState({});
   const [indicators, setIndicators] = useState([]);
   const [openWhy, setOpenWhy] = useState({});
+  const [currentIndicatorName, setCurrentIndicatorName] = useState('');
+  const [currentDrgShortCode, setCurrentDrgShortCode] = useState('');
   const PROOF_INDICATORS = [
     'Digital Literacy Policy & Governance',
     'Incident response plan',
@@ -101,6 +103,7 @@ function NewEvaluation() {
   const handleScoreChange = (indicatorName, value) => {
     const numericValue = Number(value);
     setScores(prev => ({ ...prev, [indicatorName]: Number.isNaN(numericValue) ? 0 : numericValue }));
+    setCurrentIndicatorName(indicatorName);
   };
 
   const calculateOverallScore = () => {
@@ -143,7 +146,7 @@ function NewEvaluation() {
   return (
     <div className="new-evaluation">
       <h2 style={{ marginTop: 0 }}>New Organisation Evaluation</h2>
-      <FeedbackBot route="/new-evaluation" />
+      <FeedbackBot route="/new-evaluation" indicatorName={currentIndicatorName} drgShortCode={currentDrgShortCode} />
       <form onSubmit={handleSubmit}>
         <div className="field">
           <label className="label" htmlFor="companyName">Organisation Name</label>
@@ -184,7 +187,12 @@ function NewEvaluation() {
                     const options = optionsByIndicator[name] || [];
                     const legend = indicator['Legend'];
                     return (
-                      <div className="card" key={name} style={{ gridColumn: 'span 12' }}>
+                      <div
+                        className="card"
+                        key={name}
+                        style={{ gridColumn: 'span 12' }}
+                        onMouseEnter={() => { setCurrentIndicatorName(name); setCurrentDrgShortCode(String(drg)); }}
+                      >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
                           <div style={{ flex: 2, minWidth: 260 }}>
                             <div style={{ fontWeight: 600 }}>{name}</div>
@@ -192,12 +200,12 @@ function NewEvaluation() {
                             {indicator['Rationale'] && (
                               <div
                                 style={{ margin: '8px 0', position: 'relative', display: 'inline-block' }}
-                                onMouseEnter={() => setOpenWhy(prev => ({ ...prev, [name]: true }))}
+                                onMouseEnter={() => { setOpenWhy(prev => ({ ...prev, [name]: true })); setCurrentIndicatorName(name); setCurrentDrgShortCode(String(drg)); }}
                                 onMouseLeave={() => setOpenWhy(prev => ({ ...prev, [name]: false }))}
                               >
                                 <button
                                   type="button"
-                                  onClick={() => setOpenWhy(prev => ({ ...prev, [name]: !prev[name] }))}
+                                  onClick={() => { setOpenWhy(prev => ({ ...prev, [name]: !prev[name] })); setCurrentIndicatorName(name); setCurrentDrgShortCode(String(drg)); }}
                                   aria-expanded={!!openWhy[name]}
                                   style={{
                                     background: '#fff',
@@ -241,6 +249,7 @@ function NewEvaluation() {
                               id={`sel-${name}`}
                               className="input"
                               value={scores[name] ?? ''}
+                              onFocus={() => { setCurrentIndicatorName(name); setCurrentDrgShortCode(String(drg)); }}
                               onChange={(e) => handleScoreChange(name, e.target.value)}
                               required
                             >
@@ -256,7 +265,7 @@ function NewEvaluation() {
                                     <span className="badge success" style={{ padding: '4px 8px', fontSize: 12 }}>Uploaded</span>
                                     <button
                                       type="button"
-                                      onClick={() => setProofsDraft(prev => ({ ...prev, [name]: { uploaded: true, filename: 'uploaded_document_v2.pdf' } }))}
+                                      onClick={() => { setProofsDraft(prev => ({ ...prev, [name]: { uploaded: true, filename: 'uploaded_document_v2.pdf' } })); setCurrentIndicatorName(name); setCurrentDrgShortCode(String(drg)); }}
                                       title="Replace file (mock)"
                                       style={{ padding: '6px 10px', fontSize: 12 }}
                                     >
@@ -267,7 +276,7 @@ function NewEvaluation() {
                                   <button
                                     type="button"
                                     disabled={!companyName}
-                                    onClick={() => setProofsDraft(prev => ({ ...prev, [name]: { uploaded: true, filename: 'uploaded_document.pdf' } }))}
+                                    onClick={() => { setProofsDraft(prev => ({ ...prev, [name]: { uploaded: true, filename: 'uploaded_document.pdf' } })); setCurrentIndicatorName(name); setCurrentDrgShortCode(String(drg)); }}
                                     title={companyName ? 'Upload a proof document (mock)' : 'Enter organisation name first'}
                                     style={{ padding: '6px 10px', fontSize: 12 }}
                                   >
