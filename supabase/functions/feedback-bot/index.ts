@@ -36,7 +36,7 @@ const DRG_SUMMARIES: Record<string, string> = {
 function cors(resp: Response) {
   const headers = new Headers(resp.headers);
   headers.set("Access-Control-Allow-Origin", "*");
-  headers.set("Access-Control-Allow-Headers", "*\nContent-Type");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization, apikey");
   headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   return new Response(resp.body, { status: resp.status, headers });
 }
