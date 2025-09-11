@@ -53,7 +53,18 @@ function err(req: Request, message: string, init?: number) {
 }
 
 async function handleChat(req: Request): Promise<Response> {
-  const body = await req.json().catch(() => ({}));
+  let body: any = {};
+  try {
+    const ctype = req.headers.get("content-type") || "";
+    if (ctype.includes("application/json")) {
+      body = await req.json();
+    } else {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : {};
+    }
+  } catch (_) {
+    body = {};
+  }
   const messages: ChatMessage[] = body.messages || [];
   const context = body.context || {};
   const maxTokens = Math.max(32, Math.min(Number(body.max_tokens || CHAT_MAX_TOKENS), 512));
@@ -121,7 +132,18 @@ async function handleChat(req: Request): Promise<Response> {
 }
 
 async function handleFeedback(req: Request): Promise<Response> {
-  const body = await req.json().catch(() => ({}));
+  let body: any = {};
+  try {
+    const ctype = req.headers.get("content-type") || "";
+    if (ctype.includes("application/json")) {
+      body = await req.json();
+    } else {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : {};
+    }
+  } catch (_) {
+    body = {};
+  }
   const record = {
     session_id: String(body.session_id || "").slice(0, 128),
     route: String(body.route || "").slice(0, 256),
