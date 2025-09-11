@@ -36,13 +36,24 @@ export default function FeedbackBot({
   const sessionId = useMemo(() => getOrCreateSessionId(), []);
   const panelRef = useRef(null);
 
+  const apiBase = useMemo(() => {
+    if (backendBaseUrl) return backendBaseUrl;
+    try {
+      if (typeof window !== 'undefined') {
+        const origin = window.location && window.location.origin;
+        if (origin && !origin.startsWith('file:')) return origin;
+      }
+    } catch (_) {}
+    return 'http://127.0.0.1:5000';
+  }, [backendBaseUrl]);
+
   const device = useMemo(() => (typeof window !== 'undefined' && window.innerWidth <= 768 ? 'mobile' : 'desktop'), []);
   const viewportWidth = useMemo(() => (typeof window !== 'undefined' ? window.innerWidth : 0), []);
 
   const callLLM = async (userText) => {
     try {
       console.log('Calling LLM API with:', { userText, route, indicatorName, sessionId });
-      const res = await fetch(`${backendBaseUrl}/api/llm/chat`, {
+      const res = await fetch(`${apiBase}/api/llm/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -85,7 +96,7 @@ export default function FeedbackBot({
 
       // Persist feedback via backend to keep keys server-side (always send for now)
       try {
-        const resp = await fetch(`${backendBaseUrl}/api/feedback`, {
+        const resp = await fetch(`${apiBase}/api/feedback`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
