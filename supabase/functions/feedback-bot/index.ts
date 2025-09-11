@@ -97,6 +97,9 @@ async function handleChat(req: Request): Promise<Response> {
   }
 
   try {
+    // Add a timeout to avoid hanging requests
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
     const resp = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -104,7 +107,8 @@ async function handleChat(req: Request): Promise<Response> {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ model, messages: oaiMessages, max_tokens: maxTokens, temperature }),
-    });
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
     if (!resp.ok) {
       return ok(req, { reply: "Thanks for sharing. Could you add one concrete example or suggestion?" });
     }
