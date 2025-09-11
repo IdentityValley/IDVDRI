@@ -64,16 +64,15 @@ export default function FeedbackBot({
   const callLLM = async (userText) => {
     try {
       console.log('Calling LLM API with:', { userText, route, indicatorName, sessionId });
-      // If using Supabase Edge Function, allow direct function path
-      const chatUrl = apiBase.includes('/functions/v1') ? `${apiBase}/chat` : `${apiBase}/api/llm/chat`;
-      const isFunction = apiBase.includes('/functions/v1');
-      const commonHeaders = isFunction
-        ? { 'Content-Type': 'application/json', 'apikey': supabaseAnonKey }
-        : { 'Content-Type': 'application/json' };
+      // If using Supabase Edge Function, POST to base and pass action to avoid blocked paths
+      const usingFunction = apiBase.includes('/functions/v1');
+      const chatUrl = usingFunction ? `${apiBase}` : `${apiBase}/api/llm/chat`;
+      const commonHeaders = { 'Content-Type': 'application/json' };
       const res = await fetch(chatUrl, {
         method: 'POST',
         headers: commonHeaders,
         body: JSON.stringify({
+          ...(usingFunction ? { action: 'chat' } : {}),
           messages: [{ role: 'user', content: userText }],
           context: { route, indicator_name: indicatorName, drg_short_code: drgShortCode, session_id: sessionId, asked_followup: askedFollowupRef.current },
           ...(typeof maxTokens === 'number' ? { max_tokens: maxTokens } : {}),
@@ -113,15 +112,14 @@ export default function FeedbackBot({
 
       // Persist feedback via backend to keep keys server-side (always send for now)
       try {
-        const feedbackUrl = apiBase.includes('/functions/v1') ? `${apiBase}/feedback` : `${apiBase}/api/feedback`;
-        const isFunction2 = apiBase.includes('/functions/v1');
-        const commonHeaders2 = isFunction2
-          ? { 'Content-Type': 'application/json', 'apikey': supabaseAnonKey }
-          : { 'Content-Type': 'application/json' };
+        const usingFunction2 = apiBase.includes('/functions/v1');
+        const feedbackUrl = usingFunction2 ? `${apiBase}` : `${apiBase}/api/feedback`;
+        const commonHeaders2 = { 'Content-Type': 'application/json' };
         const resp = await fetch(feedbackUrl, {
           method: 'POST',
           headers: commonHeaders2,
           body: JSON.stringify({
+            ...(usingFunction2 ? { action: 'feedback' } : {}),
             session_id: sessionId,
             route,
             indicator_name: indicatorName || null,
