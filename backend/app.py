@@ -29,6 +29,7 @@ CHAT_SYSTEM_PROMPT = os.getenv('CHAT_SYSTEM_PROMPT', (
     "You are a friendly, concise assistant for the Digital Responsibility Index website. "
     "Note: ‘DRG’ always means Digital Responsibility Goal (not group). "
     "Your job is to: (1) help users provide actionable feedback on the evaluation, and (2) answer questions about the website, the evaluation flow, indicators/DRGs (including brief overviews of any DRG 1–7), and Identity Valley. "
+    "When asked what ‘level’ to choose for a specific indicator, propose a sensible level with a brief rationale based on the user’s situation, and suggest updating later if their practice matures. "
     "Stay within those topics; if something is clearly out of scope, gently say so. "
     "Ask at most one short clarifying question, and only when needed to help. "
     "Keep answers brief (1–3 sentences), warm in tone, and avoid links."
@@ -120,6 +121,15 @@ def load_indicators():
     ]
 
 INDICATORS_STATIC = load_indicators()
+# Build quick-lookup map for indicators by name (case-insensitive)
+INDICATOR_MAP = {}
+try:
+    for _it in INDICATORS_STATIC:
+        _name = str(_it.get('Criterion/Metric Name') or '').strip()
+        if _name:
+            INDICATOR_MAP[_name.lower()] = _it
+except Exception:
+    pass
 
 # --- Static site context (optional) ---
 def _load_site_context() -> str:
@@ -341,6 +351,53 @@ def llm_chat():
         for m in tail:
             role = 'user' if m.get('role') == 'user' else 'assistant'
             oai_messages.append({"role": role, "content": m.get('content', '')[:2000]})
+
+        # Inject indicator details (question/rationale/scoring/legend) when available
+        def _indicator_snippet(ind):
+            name = str(ind.get('Criterion/Metric Name') or '')
+            q = str(ind.get('Question') or '')[:400]
+            r = str(ind.get('Rationale') or '')[:400]
+            s = str(ind.get('Scoring Logic') or '')[:400]
+            lg = str(ind.get('Legend') or '')[:400]
+            drg = str(ind.get('DRG') or ind.get('DRG Short Code') or '')
+            parts = [
+                f"Indicator: {name}" + (f" (DRG {drg})" if drg else ''),
+            ]
+            if q:
+                parts.append(f"Question: {q}")
+            if r:
+                parts.append(f"Rationale: {r}")
+            if s:
+                parts.append(f"Scoring: {s}")
+            if lg:
+                parts.append(f"Legend: {lg}")
+            return "\n".join(parts)
+
+        # 1) From provided context
+        if indicator_name:
+            ind = INDICATOR_MAP.get(str(indicator_name).lower())
+            if ind:
+                oai_messages.append({"role": "system", "content": _indicator_snippet(ind)[:1500]})
+
+        # 2) From last user message if not already added
+        try:
+            if not indicator_name:
+                last_user2 = None
+                for m in reversed(tail):
+                    if m.get('role') == 'user':
+                        last_user2 = str(m.get('content') or '')
+                        break
+                if last_user2:
+                    lu_lower = last_user2.lower()
+                    best = None
+                    for key_name, ind in INDICATOR_MAP.items():
+                        if key_name and key_name in lu_lower:
+                            best = ind
+                            break
+                    if best:
+                        oai_messages.append({"role": "system", "content": _indicator_snippet(best)[:1500]})
+        except Exception:
+            pass
 
         # If the latest user message appears to ask about a DRG by name/number, inject detail
         try:
